@@ -1,0 +1,21 @@
+{
+  "name": "aoc",
+  "version": "1.0.0",
+  "description": "AOC 2024",
+  "main": "src/main.ts",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/main.js",
+    "dev": "ts-node --project tsconfig.json src/main.ts"
+  },
+  "author": "B.Mathieu",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5"
+  }
+}
