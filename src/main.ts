@@ -6,7 +6,7 @@
     // generateFolder(path_folder, i);
 //}
 
-// require('./day - 1/main');
+// require('./day - 1/main'); 
 // require('./day - 2/main');
 require('./day - 3/main');
 // require('./day - 4/main');
