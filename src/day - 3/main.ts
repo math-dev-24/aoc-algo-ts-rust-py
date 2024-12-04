@@ -1,6 +1,5 @@
 
-const fs = require('fs');
-const path = require('path');
+c
 
 const data_day_3 = fs.readFileSync(path.join(__dirname, './data.txt'), 'utf8').trim();
 
