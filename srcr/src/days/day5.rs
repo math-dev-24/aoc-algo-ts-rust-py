@@ -5,22 +5,30 @@ use std::time::Instant;
 pub fn solve_day_5() {
     let input = fs::read_to_string("assets/day5.txt").expect("Fichier introuvable");
     let start = Instant::now();
-
     let (rules, updates) = parse_input(&input);
 
-    let graph = build_graph(&rules);
+    let mut total_part_1 = 0;
+    let mut total_part_2 = 0;
+    let mut unordered_updates = Vec::new();
 
-    let mut sum_of_middles = 0;
-
-    for update in updates {
-        let sorted_update = topological_sort(&graph, &update);
-        if !sorted_update.is_empty() {
-            let middle = sorted_update[sorted_update.len() / 2];
-            sum_of_middles += middle;
+    for update in &updates {
+        if is_update_ordered(update, &rules) {
+            total_part_1 += get_middle(update);
+        } else {
+            unordered_updates.push(update.clone());
         }
     }
+    let graph: HashMap<i32, Vec<i32>> = build_graph(&rules);
 
-    println!("Somme des milieux : {}", sum_of_middles);
+    for bad in &unordered_updates {
+        let tempo = topological_sort(&graph, bad);
+        total_part_2 += get_middle(&tempo)
+
+    }
+
+
+    println!("Partie 1 : {}", total_part_1);
+    println!("Partie 2 : {}", total_part_2);
     println!("Temps total : {:.2?}", start.elapsed());
 }
 
@@ -29,30 +37,47 @@ fn parse_input(input: &str) -> (Vec<(i32, i32)>, Vec<Vec<i32>>) {
     let mut rules = Vec::new();
     let mut updates = Vec::new();
 
+    // Section des règles
     for line in lines.by_ref() {
         if line.trim().is_empty() {
             break;
         }
-        let parts: Vec<i32> = line
-            .split('|')
-            .map(|x| x.trim().parse::<i32>().unwrap())
-            .collect();
+        let parts: Vec<i32> = line.split('|').map(|x| x.trim().parse().unwrap()).collect();
         rules.push((parts[0], parts[1]));
     }
 
+    // Section des mises à jour
     for line in lines {
-        let update: Vec<i32> = line
-            .split(',')
-            .map(|x| x.trim().parse::<i32>().unwrap())
-            .collect();
+        let update: Vec<i32> = line.split(',').map(|x| x.trim().parse().unwrap()).collect();
         updates.push(update);
     }
 
     (rules, updates)
 }
 
+
+fn is_update_ordered(update: &Vec<i32>, rules: &Vec<(i32, i32)>) -> bool {
+    for &(a, b) in rules {
+        if let (Some(pos_a), Some(pos_b)) = (
+            update.iter().position(|&x| x == a),
+            update.iter().position(|&x| x == b),
+        ) {
+            if pos_a > pos_b {
+                return false;
+            }
+        }
+    }
+    true
+}
+
+
+fn get_middle(update: &Vec<i32>) -> i32 {
+    update[update.len() / 2]
+}
+
+
 fn build_graph(rules: &Vec<(i32, i32)>) -> HashMap<i32, Vec<i32>> {
-    let mut graph: HashMap<i32, Vec<i32>> = HashMap::with_capacity(rules.len());
+    let mut graph: HashMap<i32, Vec<i32>> = HashMap::new();
     for &(a, b) in rules {
         graph.entry(a).or_insert(Vec::new()).push(b);
     }
@@ -60,10 +85,11 @@ fn build_graph(rules: &Vec<(i32, i32)>) -> HashMap<i32, Vec<i32>> {
 }
 
 fn topological_sort(graph: &HashMap<i32, Vec<i32>>, update: &Vec<i32>) -> Vec<i32> {
-    let mut in_degree: HashMap<i32, usize> = HashMap::new();
+    let mut in_degree = HashMap::new();
     for &node in update {
         in_degree.insert(node, 0);
     }
+
 
     for (&node, neighbors) in graph.iter() {
         for &neighbor in neighbors {
@@ -73,11 +99,15 @@ fn topological_sort(graph: &HashMap<i32, Vec<i32>>, update: &Vec<i32>) -> Vec<i3
         }
     }
 
-    let mut queue: Vec<i32> = Vec::new();
-    for &node in update {
-        if *in_degree.get(&node).unwrap_or(&0) == 0 {
-            queue.push(node);
-        }
+
+    let mut queue: Vec<i32> = update
+        .iter()
+        .cloned()
+        .filter(|&node| *in_degree.get(&node).unwrap_or(&0) == 0)
+        .collect();
+
+    if queue.is_empty() {
+        return Vec::new();
     }
 
     let mut result = Vec::new();
@@ -96,5 +126,6 @@ fn topological_sort(graph: &HashMap<i32, Vec<i32>>, update: &Vec<i32>) -> Vec<i3
         }
     }
 
+    println!("Sorted result: {:?}", result); // Vérifiez le résultat final
     result
 }
