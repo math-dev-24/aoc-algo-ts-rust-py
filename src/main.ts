@@ -9,8 +9,8 @@
 // require('./day - 1/main'); 
 // require('./day - 2/main');
 // require('./day - 3/main');
-require('./day - 4/main');
-// require('./day - 5/main');
+// require('./day - 4/main');
+require('./day - 5/main');
 // require('./day - 6/main');
 // require('./day - 7/main');
 // require('./day - 8/main');

@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+// const fs = require('fs');
+// const path = require('path');
 
 const directions: number[][] = [
     [0, 1],   // Droite
