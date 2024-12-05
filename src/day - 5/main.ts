@@ -74,11 +74,10 @@ function getMiddlePage(update: number[]): number {
     return update[middleIndex];
 }
 
-// Analyse des mises à jour
-let total: number = 0;
 
+let total: number = 0;
 for (const update of updates) {
-    const pages = update.split(',').map(Number); // Convertir en tableau de nombres
+    const pages = update.split(',').map(Number);
 
     if (!isValidUpdate(pages, rules)) {
         const reordered: number[] = reorderUpdate(pages, rules);
