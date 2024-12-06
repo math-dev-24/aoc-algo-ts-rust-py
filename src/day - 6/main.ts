@@ -7,8 +7,8 @@ const time_start = new Date().getTime();
 const grid: string[][] = data_day_6.split("\n").map((r: string) => r.trim().split(""));
 const q_row: number = grid.length;
 const q_col: number = grid[0].length;
-let guardInitPos: [number, number] | null = null;
-let guardInitDir: Direction | null = null;
+let guardInitPos: [number, number] | null;
+let guardInitDir: Direction | null;
 
 type Direction = '^' | '>' | 'v' | '<';
 const turnOrder: Direction[] = ['^', '>', 'v', '<'];
@@ -96,11 +96,11 @@ let totalPart2: number = 0;
 
 for (const cell of totalPart1[1]) {
     const [r, c] = cell.split(",").map(Number);
-    if (grid[r][c] == ".") {
-        const tmpGrid = grid.map(row => [...row]);
-        tmpGrid[r][c] = "O";
-        const [isLooping] = simulateGuardPatrol(tmpGrid, q_row, q_col, guardInitPos, guardInitDir, true);
+    if (grid[r][c] == "."){
+        grid[r][c] = "O";
+        const [isLooping] = simulateGuardPatrol(grid, q_row, q_col, guardInitPos, guardInitDir, true);
         if (isLooping) totalPart2++;
+        grid[r][c] = ".";
     }
 }
 const time_end_part2: number = new Date().getTime();
