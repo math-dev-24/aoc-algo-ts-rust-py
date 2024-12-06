@@ -7,8 +7,8 @@ const time_start = new Date().getTime();
 const grid: string[][] = data_day_6.split("\n").map((r: string) => r.trim().split(""));
 const q_row: number = grid.length;
 const q_col: number = grid[0].length;
-let guardInitPos: [number, number]|null = null;
-let guardInitDir: Direction|null = null;
+let guardInitPos: [number, number] | null = null;
+let guardInitDir: Direction | null = null;
 
 type Direction = '^' | '>' | 'v' | '<';
 const turnOrder: Direction[] = ['^', '>', 'v', '<'];
@@ -36,7 +36,13 @@ const getInitPos = (grid: string[][], rows: number, cols: number): [[number, num
 
 }
 
-const simulateGuardPatrol = (grid: string[][], rows: number, cols: number, iniPosition: [number,number], initDir: Direction, detectLoop: boolean = false): [boolean, number] => {
+const simulateGuardPatrol = (
+    grid: string[][],
+    rows: number, cols: number,
+    iniPosition: [number, number],
+    initDir: Direction,
+    detectLoop: boolean = false
+): [ boolean, Set<string> ] => {
 
     const directions: Record<Direction, [number, number]> = {
         '^': [-1, 0],  // Haut
@@ -55,7 +61,7 @@ const simulateGuardPatrol = (grid: string[][], rows: number, cols: number, iniPo
         const state = detectLoop ? `${r},${c},${guardDir}` : `${r},${c}`;
 
         if (visited.has(state) && detectLoop) {
-            return [true, visited.size];
+            return [true, visited];
         }
 
         visited.add(state);
@@ -64,12 +70,12 @@ const simulateGuardPatrol = (grid: string[][], rows: number, cols: number, iniPo
         const [fr, fc] = [r + dr, c + dc];
 
         if (fr < 0 || fr >= rows || fc < 0 || fc >= cols) {
-            return [false, visited.size]
+            return [false, visited]
         }
-        const frontCell = grid[fr][fc];
+        const frontCell: string = grid[fr][fc];
 
         if (frontCell === "#" || frontCell == "O") {
-            const currentDirIdx = turnOrder.indexOf(guardDir);
+            const currentDirIdx: number = turnOrder.indexOf(guardDir);
             guardDir = turnOrder[(currentDirIdx + 1) % 4];
         } else {
             guardPos = [fr, fc];
@@ -77,27 +83,24 @@ const simulateGuardPatrol = (grid: string[][], rows: number, cols: number, iniPo
     }
 };
 
-
 const initPosition = getInitPos(grid, q_row, q_col);
 guardInitPos = initPosition[0];
 guardInitDir = initPosition[1];
 
 const time_int: number = new Date().getTime();
-const totalPart1: number = simulateGuardPatrol(grid, q_row, q_col, guardInitPos, guardInitDir)[1]
+const totalPart1 = simulateGuardPatrol(grid, q_row, q_col, guardInitPos, guardInitDir)
 const time_end_part1: number = new Date().getTime();
-console.log("Partie 1 :", totalPart1, ", en :", (time_end_part1 - time_start) / 1000, "s");
+console.log("Partie 1 :", totalPart1[1].size, ", en :", (time_end_part1 - time_start) / 1000, "s");
 
 let totalPart2: number = 0;
 
-for (let r = 0; r < q_row; r++){
-    for (let c = 0; c < q_col; c++){
-        if (guardInitPos[0] == r && guardInitPos[1] == c) continue;
-        if (grid[r][c] == "."){
-            const tmpGrid = grid.map(row => [...row]);
-            tmpGrid[r][c] = "O";
-            const [isLooping] = simulateGuardPatrol(tmpGrid, q_row, q_col, guardInitPos, guardInitDir, true);
-            if (isLooping) totalPart2++;
-        }
+for (const cell of totalPart1[1]) {
+    const [r, c] = cell.split(",").map(Number);
+    if (grid[r][c] == ".") {
+        const tmpGrid = grid.map(row => [...row]);
+        tmpGrid[r][c] = "O";
+        const [isLooping] = simulateGuardPatrol(tmpGrid, q_row, q_col, guardInitPos, guardInitDir, true);
+        if (isLooping) totalPart2++;
     }
 }
 const time_end_part2: number = new Date().getTime();
