@@ -18,6 +18,7 @@ pub fn solve_day_5() {
             unordered_updates.push(update.clone());
         }
     }
+    
     let graph: HashMap<i32, Vec<i32>> = build_graph(&rules);
 
     for bad in &unordered_updates {

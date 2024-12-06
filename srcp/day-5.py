@@ -9,7 +9,6 @@ updates: List[List[int]] = [list(map(int, el.split(","))) for el in datas_day_5[
 
 struct_time = time.time() - start
 
-
 def get_center_page(u: List[int]) -> int:
     return u[len(u) // 2]
 
