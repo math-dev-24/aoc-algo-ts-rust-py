@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+// const fs = require('fs');
+// const path = require('path');
 
 const data_day_5 = fs.readFileSync(path.join(__dirname, './data.txt'), 'utf8').split("\n");
 const emptyLineIndex = data_day_5.indexOf('');

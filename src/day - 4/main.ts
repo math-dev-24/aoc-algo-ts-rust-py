@@ -14,7 +14,7 @@ const directions: number[][] = [
 
 const data_day_4 = fs.readFileSync(path.join(__dirname, './data.txt'), 'utf8').trim().split("\n");
 
-const grid: string[][] = data_day_4.map((line: string) => line.split(""))
+const grid_d4: string[][] = data_day_4.map((line: string) => line.split(""))
 
 
 console.log("Resultat : ", findXMAS(grid, "XMAS"));
@@ -43,7 +43,7 @@ function is_word_found(row: number, col: number, dir_row: number, dir_col: numbe
     for (let i = 0; i < search.length; i++){
         const tmp_row: number = row + i * dir_row;
         const tmp_col: number = col + i * dir_col;
-        
+
         if (tmp_row < 0 || tmp_row >= grid.length || tmp_col < 0 || tmp_col >= grid[0].length || grid[tmp_row][tmp_col] !== search[i]) {
             return false;
         }
