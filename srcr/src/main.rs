@@ -1,7 +1,7 @@
 mod days;
 
-use crate::days::day6::solve_day_6;
+use crate::days::day7::solve_day_7;
 
 fn main() {
-    solve_day_6();
+    solve_day_7();
 }

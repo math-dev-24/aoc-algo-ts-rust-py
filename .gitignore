@@ -2,5 +2,5 @@ node_modules/
 dist/
 .env
 srcr/target/
-srcr/assets/
+srcr/src/assets/
 **/data.txt
