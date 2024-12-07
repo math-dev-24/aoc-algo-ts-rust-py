@@ -1,13 +1,8 @@
-use std::time::Instant;
-
-
-pub fn solve_day_7() {
-    let start_time: Instant = Instant::now();
+pub fn solve_day_7(input: &str) {
     let operators: Vec<char> = vec!['+', '*', '|'];
-    let mut total: u128 = 0;
-    let data: &str = "194558: 2 6 664 40 874 40 7";
+    let mut total = 0;
 
-    for line in data.lines() {
+    for line in input.lines() {
         let target = line.trim().split(':').next().unwrap().trim().parse::<u128>().unwrap();
         let numbers = line.split(':')
             .last()
@@ -22,7 +17,7 @@ pub fn solve_day_7() {
             total += target;
         }
     }
-    println!("total : {} en {}s", total, start_time.elapsed().as_secs_f64());
+    println!("total : {}", total);
 }
 
 fn find_valid_operations(numbers: &Vec<u128>, target: &u128, operators: &Vec<char>) -> u128 {
