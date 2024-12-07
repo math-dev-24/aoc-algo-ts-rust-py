@@ -1,19 +1,23 @@
 import time
+from collections import defaultdict
+from srcp.utils.input import get_data
 
 start = time.time()
 
-datas_day_5 = datas.strip().splitlines()
+datas_day_5 = get_data(2024, 5).strip().splitlines()
+
 separator_index = datas_day_5.index("")
-rules: List[Tuple[int, ...]] = [tuple(map(int, el.split("|"))) for el in datas_day_5[:separator_index]]
-updates: List[List[int]] = [list(map(int, el.split(","))) for el in datas_day_5[separator_index + 1:]]
+rules: list[tuple[int, ...]] = [tuple(map(int, el.split("|"))) for el in datas_day_5[:separator_index]]
+updates: list[list[int]] = [list(map(int, el.split(","))) for el in datas_day_5[separator_index + 1:]]
 
 struct_time = time.time() - start
 
-def get_center_page(u: List[int]) -> int:
+
+def get_center_page(u: list[int]) -> int:
     return u[len(u) // 2]
 
 
-def is_update_ordered(tmp_update: List[int], list_rules: List[Tuple[int, ...]]) -> bool:
+def is_update_ordered(tmp_update: list[int], list_rules: list[tuple[int, ...]]) -> bool:
     for r in list_rules:
         if r[0] in tmp_update and r[1] in tmp_update:
             if tmp_update.index(r[0]) > tmp_update.index(r[1]):
@@ -28,19 +32,19 @@ for update in updates:
 
 print(f"Total part 1 : {total}")
 end = time.time()
-print(end - start)
+print(f"Time : {end - start:.2f}s")
 
 total_2: int = 0
 
 
-def build_graph(tmp_rulers: List[Tuple[int, ...]]) -> Dict[int, List[int]]:
-    tmp_graph: Dict[int, List[int]] = defaultdict(list)
+def build_graph(tmp_rulers: list[tuple[int, ...]]) -> dict[int, list[int]]:
+    tmp_graph: dict[int, list[int]] = defaultdict(list)
     for a, b in tmp_rulers:
         tmp_graph[a].append(b)
     return tmp_graph
 
 
-def topological_sort(tmp_graph: Dict[int, List[int]], update: List[int]) -> List[int]:
+def topological_sort(tmp_graph: dict[int, list[int]], update: list[int]) -> list[int]:
     in_degree = {u: 0 for u in update}
     for u in update:
         if u in tmp_graph:
@@ -73,4 +77,4 @@ for update in updates:
 
 print(f"Total part 2 : {total_2}")
 end_2 = time.time()
-print((end_2 - end) + struct_time)
+print(f"Time : {(end_2 - end) + struct_time:.2f}s")

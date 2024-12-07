@@ -1,54 +1,46 @@
-test = """
-MMMSXXMASM
-MSAMXMSMSA
-AMXSXMAAMM
-MSAMASMSMX
-XMASAMXAMM
-XXAMMXXAMA
-SMSMSASXSS
-SAXAMASAAA
-MAMMMXMMMM
-MXMXAXMASX
-"""
+import time
+from srcp.utils.input import get_data
 
-directions: list[tuple[int, int]] = [
-    (0, 1),
-    (0, -1),
-    (1, 0),
-    (-1, 0),
-    (1, 1),
-    (1, -1),
-    (-1, 1),
-    (-1, -1),
-]
+data = get_data(2024, 4).strip()
+start = time.time()
 
-data = test.strip().split("\n")
-grid: list[list[str]] = []
+result_1 = result_2 = 0
+grid: list[list[str]] = [list(line) for line in data.split("\n")]
+rows, cols = len(lines := data.split()), len(lines)
 
-for line in data:
-    grid.append(list(line))
+list_x: list[tuple[int, int]] = []
+list_center: list[tuple[int, int]] = []
+list_dir: tuple[int, ...] = (-1, 0, 1)
+word: str = "XMAS"
 
-count: int = 0
-searchWord: str = "XMAS"
+for r in range(rows):
+    for c in range(cols):
+        list_x += [(r, c)] if grid[r][c] == "X" else []
+        list_center += [(r, c)] if grid[r][c] == "A" else []
 
+for rx, cx in list_x:
+    for di in list_dir:
+        for dj in list_dir:
+            result_1 += all(
+                0 <= (ty := rx + k * di) < rows and
+                0 <= (tx := cx + k * dj) < cols and
+                grid[ty][tx] == c
+                for k, c in enumerate(word)
+            )
 
-def is_word_found(start_row: int, start_col: int, dir_row: int, dir_col: int) -> bool:
-    for i in range(len(searchWord)):
-        new_row = start_row + i * dir_row
-        new_col = start_col + i * dir_col
+print(f"Result 1: {result_1} in {time.time() - start:.2f} s")
+time_int = time.time()
 
-        if not (0 <= new_row < len(grid) and 0 <= new_col < len(grid[0])):
-            return False
+for ca, ra in list_center:
+    if (
+            (xl := ra - 1) >= 0 and # L pour left
+            (xr := ra + 1) < cols and # R pour right
+            (yt := ca - 1) >= 0 and # T pour top
+            (yb := ca + 1) < rows # B pour bottom
+    ):
+        diag_1 = {grid[yt][xl], grid[yb][xr]}
+        diag_2 = {grid[yt][xr], grid[yb][xl]}
 
-        if grid[new_row][new_col] != searchWord[i]:
-            return False
-    return True
+        result_2 += (diag_1 == diag_2 == set("MS"))
 
-
-for row in range(len(grid)):
-    for col in range(len(grid[0])):
-        for dir_row, dir_col in directions:
-            if is_word_found(row, col, dir_row, dir_col):
-                count += 1
-
-print(count)
+print(f"Result 2: {result_2} in {time.time() - time_int:.2f} s")

@@ -1,10 +1,11 @@
 import re
 import time
+from srcp.utils.input import get_data
 
 start_time: float = time.time()
 score: int = 0
 state: bool = True
-test: str = "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))"
+test: str = get_data(2024, 3).strip()
 pattern: str = r"mul\(\d+,\d+\)|don't\(\)|do\(\)"
 
 matches = re.findall(pattern, test)
@@ -16,5 +17,5 @@ for match in matches:
     else:
         state = match == "do()"
 
-print(f"Regex - Time: {time.time() - start_time} - Score: {score}")
+print(f"Time: {time.time() - start_time} - Score: {score}")
 

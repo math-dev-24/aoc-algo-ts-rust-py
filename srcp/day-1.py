@@ -1,16 +1,10 @@
 import time
+from srcp.utils.input import get_data
 
-test: str = """
-3   4
-4   3
-2   5
-1   3
-3   9
-3   3
-"""
+data = get_data(2024, 1)
 
 start_time = time.time()
-data = test.strip().split("\n")
+data = data.strip().split("\n")
 
 deck_1, deck_2 = map(list, zip(*[map(int, line.split()) for line in data]))
 

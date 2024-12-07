@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
+
 const data_day_7 = fs.readFileSync(path.join(__dirname, './data.txt'), 'utf8');
 
 const operators: string[] = ["+", "*", "||"];

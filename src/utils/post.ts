@@ -1,8 +1,5 @@
 import * as dotenv from 'dotenv';
-
 dotenv.config();
-
-const BASE_URL: string = 'https://adventofcode.com';
 
 export async function postAnswer(day: number, level: number, answer: string): Promise<void> {
     const year: number = new Date().getFullYear();
@@ -14,11 +11,11 @@ export async function postAnswer(day: number, level: number, answer: string): Pr
         }).toString();
 
         const response: Response = await fetch(
-            `${BASE_URL}/${year}/day/${day}/answer`, {
+            `${process.env.URL}/${year}/day/${day}/answer`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
-                    'Cookie': `session=${process.env.SESSION_COOKIE}`,
+                    'Cookie': `session=${process.env.SESSION}`,
                 },
                 body,
             }
@@ -27,13 +24,15 @@ export async function postAnswer(day: number, level: number, answer: string): Pr
         if (response.ok) {
             const text: string = await response.text();
             console.log('Réponse soumise avec succès.');
-            console.log("Réponse : ",text);
+            if (text.includes("That's not the right answer;")) {
+                console.log('Mauvaise réponse.');
+            }else {
+                console.log('Bonne réponse.');
+            }
         } else {
             console.error(`Erreur lors de l'envoi de la réponse : ${response.status}`);
             console.error(await response.text());
         }
-
-
     } catch (error: any) {
         console.error('Erreur:', error.message || error);
     }

@@ -1,20 +1,9 @@
-data = """
-....#.....
-.........#
-..........
-..#.......
-.......#..
-..........
-.#..^.....
-........#.
-#.........
-......#...
-"""
 import time
+from srcp.utils.input import get_data
 
 start = time.time()
 
-data = data.strip().splitlines()
+data = get_data(2024, 6).strip().splitlines()
 grid: list[list[str]] = list(map(list, data))
 
 turnOrder: list[str] = ['^', '>', 'v', '<']
@@ -31,16 +20,18 @@ for row in range(len(grid)):
             break
 
 
-def simulate_guard_patrol(grid: list[list[str]], rows: int, cols: int,
-                          ini_position: list[int], init_dir: str,
-                          detect_loop: bool = False) -> tuple[bool, set[str]]:
+def simulate_guard_patrol(
+        grid: list[list[str]], rows: int, cols: int,
+        ini_position: list[int], init_dir: str,
+        detect_loop: bool = False
+) -> tuple[bool, set[str]]:
+
     directions = {
         '^': (-1, 0),
         '>': (0, 1),
         'v': (1, 0),
         '<': (0, -1),
     }
-
     turn_order = ['^', '>', 'v', '<']
     guard_pos = list(ini_position)
     guard_dir = init_dir
@@ -51,7 +42,7 @@ def simulate_guard_patrol(grid: list[list[str]], rows: int, cols: int,
         r, c = guard_pos
         state = f"{r},{c},{guard_dir}" if detect_loop else f"{r},{c}"
 
-        # Vérification de boucle
+        # Vérification de boucle si retour au point de départ
         if state in visited and detect_loop:
             return True, visited
 
@@ -75,20 +66,21 @@ def simulate_guard_patrol(grid: list[list[str]], rows: int, cols: int,
 q_row: int = len(grid)
 q_col: int = len(grid[0])
 time_int = time.time() - start
-totalPart1: [bool, set[str]] = simulate_guard_patrol(grid, q_row, q_col, positionInitGuard,directionInitGuard)
-print(f"Part 1: {len(totalPart1[1])} en {time_int:.2f}s")
+
+_, list_1 = simulate_guard_patrol(grid, q_row, q_col, positionInitGuard, directionInitGuard)
+
+print(f"Part 1: {len(list_1)} en {time_int:.2f}s")
 
 totalPart2: int = 0
 
-for cell in totalPart1[1]:
+for cell in list_1:
     r, c = cell.split(",")
     if grid[int(r)][int(c)] == ".":
         grid[int(r)][int(c)] = "O"
-        (is_loop, visited) = simulate_guard_patrol(grid, q_row, q_col, positionInitGuard, directionInitGuard, True)
+        is_loop, _ = simulate_guard_patrol(grid, q_row, q_col, positionInitGuard, directionInitGuard, True)
         if is_loop:
             totalPart2 += 1
         grid[int(r)][int(c)] = "."
-
 
 end = time.time()
 print(f"Part 2: {totalPart2} en {(time_int + (end - start)):.2f}s")

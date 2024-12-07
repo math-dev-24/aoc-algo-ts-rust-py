@@ -1,7 +1,4 @@
-// const fs = require('fs');
-// const path = require('path');
-
-const data_day_1 = fs.readFileSync(path.join(__dirname, './data.txt'), 'utf8').trim().split("\n");
+const data_day_1 = "1\n9\n8\n2\n3\n7\n6\n4\n5".split('\n');
 
 const sorted = (a: number, b: number) => a - b;
 

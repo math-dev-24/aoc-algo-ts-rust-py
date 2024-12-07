@@ -1,29 +1,25 @@
-def get_direction(n1: str, n2: str) -> int:
-    return 1 if int(n1) < int(n2) else -1
+from srcp.utils.input import get_data
+import time
+
+start_time = time.time()
 
 
-def is_safe(arr: list[str]) -> (bool, int):
-    d: int = get_direction(arr[1], arr[0])
-    q_error: int = 0
-
-    for i in range(1, len(arr)):
-        delta: float = abs(int(arr[i]) - int(arr[i - 1]))
-        c_d: int = get_direction(arr[i], arr[i - 1])
-
-        if delta < 1 or delta > 3 or c_d != d:
-            q_error += 1
-            if q_error > 1:
-                return False, 2
-    return q_error == 0, q_error
+def is_safe(arr: tuple[int, ...]) -> bool:
+    directions = [a - b for a, b in zip(arr, arr[1:])]
+    return all(1 <= d <= 3 for d in directions) or all(-3 <= d <= -1 for d in directions)
 
 
-list_line: list[str] = reports.strip().split("\n")
-score: int = 0
+list_line: list[str] = get_data(2024, 2).strip().split("\n")
+score_part_1: int = 0
+score_part_2: int = 0
 
-# O(n²)
+
 for line in list_line:
-    safe, q_error = is_safe(line.split(" "))
-    if safe or q_error == 1:
-        score += 1
+    line = tuple(map(int, line.strip().split(" ")))
+    score_part_1 += is_safe(line)
+    # une des boucles est valide en enlevant un item
+    score_part_2 += any(is_safe(line[:i] + line[i+1:]) for i in range(len(line)))
 
-print(score)
+
+print(f"Score : {score_part_1}")
+print(f"Score : {score_part_2} en {time.time() - start_time}s")
