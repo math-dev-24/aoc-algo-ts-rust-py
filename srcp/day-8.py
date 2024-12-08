@@ -37,6 +37,9 @@ for frequency, antennes in list.items():
 
         factor = 1
         while True:
+            def is_in_grid(node):
+                return 0 <= node[0] < len(grid) and 0 <= node[1] < len(grid[0])
+
             scaled_dx = dx * factor
             scaled_dy = dy * factor
 
@@ -45,23 +48,11 @@ for frequency, antennes in list.items():
 
             # print(f"n1: {n1}, n2: {n2}")
 
-            if (
-                not (0 <= n1[0] < len(grid) and 0 <= n1[1] < len(grid[0]))
-                and not (0 <= n2[0] < len(grid) and 0 <= n2[1] < len(grid[0]))
-            ):
+            if not is_in_grid(n1) and not is_in_grid(n2):
                 break
-
-            if (
-                0 <= n1[0] < len(grid) and
-                0 <= n1[1] < len(grid[0]) and
-                n1 not in antennes
-            ):
+            if n1 not in antennes and is_in_grid(n1):
                 anti_nodes.add(n1)
-            if (
-                0 <= n2[0] < len(grid) and
-                0 <= n2[1] < len(grid[0]) and
-                n2 not in antennes
-            ):
+            if n2 not in antennes and is_in_grid(n2):
                 anti_nodes.add(n2)
             factor += 1
 
