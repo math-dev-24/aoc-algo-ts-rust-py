@@ -1,3 +1,4 @@
+from collections import defaultdict
 from itertools import combinations
 from srcp.utils.input import get_data
 
@@ -5,25 +6,22 @@ test = get_data(2024, 8)
 
 lines = test.strip().replace("#", ".").splitlines()
 
-grid = [list(map(str, line)) for line in lines]
+# dict (y, x) -> char
+grid: dict = {(i, j): c for j, line in enumerate(lines) for i, c in enumerate(line)}
 
 
-def get_antennas(q_row: int) -> dict:
-    tmp_list = {}
-    for row in range(q_row):
-        chars = [(col, char) for (col, char) in enumerate(lines[row]) if char != '.']
-        if chars:
-            for col, char in chars:
-                if char not in tmp_list:
-                    tmp_list[char] = []
-                tmp_list[char].append((row, col))
+def get_antennas(tmp_grid: dict) -> dict:
+    tmp_list = defaultdict(set)
+    for yx, c in tmp_grid.items():
+        if c != ".":
+            tmp_list[c].add(yx)
     return tmp_list
 
 
-list_antennas: dict = get_antennas(len(grid[0]))
+list_antennas: dict = get_antennas(grid)
 anti_nodes = set()
 
-for char, antennas in list_antennas.items():
+for _, antennas in list_antennas.items():
     if len(antennas) > 1:
         anti_nodes.update(antennas)
 
@@ -35,7 +33,7 @@ for char, antennas in list_antennas.items():
         factor = 1
         while True:
             def is_in_grid(node):
-                return 0 <= node[0] < len(grid) and 0 <= node[1] < len(grid[0])
+                return 0 <= node[0] < len(lines) and 0 <= node[1] < len(lines[0])
 
             scaled_dx = dx * factor
             scaled_dy = dy * factor
@@ -43,13 +41,9 @@ for char, antennas in list_antennas.items():
             n1 = (y1 - scaled_dy, x1 - scaled_dx)
             n2 = (y2 + scaled_dy, x2 + scaled_dx)
 
-            if not is_in_grid(n1) and not is_in_grid(n2):
-                break
-
-            if is_in_grid(n1):
-                anti_nodes.add(n1)
-            if is_in_grid(n2):
-                anti_nodes.add(n2)
+            if not is_in_grid(n1) and not is_in_grid(n2): break
+            if is_in_grid(n1): anti_nodes.add(n1)
+            if is_in_grid(n2): anti_nodes.add(n2)
             factor += 1
 
 print(len(anti_nodes))
