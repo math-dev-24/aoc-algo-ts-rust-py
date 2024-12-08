@@ -1,6 +1,6 @@
 use dotenvy::dotenv;
 use std::env;
-use reqwest::Client;
+use reqwest::{Client, Response};
 
 
 pub struct Input {
@@ -23,7 +23,7 @@ impl Input {
     pub async fn get_input(&self, year: u32, day: u32) -> String {
         let url = format!("{}/{}/day/{}/input", &self.base_url, year, day);
 
-        let response = self
+        let response: Response = self
             .client
             .get(url)
             .header("Cookie", &self.cookie)
