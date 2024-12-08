@@ -4,14 +4,18 @@ mod utils;
 use std::time::Instant;
 use utils::input::Input;
 
-use crate::days::day4::solve_day_4;
+use crate::days::day8::solve_day_8;
 
 #[tokio::main]
 async fn main() {
     let input = Input::new();
-    let get_input = input.get_input(2024, 4).await;
-
+    let year = 2024;
+    let day = 8;
+    println!("Récupération des données...[year:{},day:{}]", &year, &day);
+    let get_input = input.get_input(year, day).await;
+    println!("Récupération des données...OK");
+    println!("Début du script...");
     let start_time: Instant = Instant::now();
-    solve_day_4(&get_input);
+    solve_day_8(&get_input);
     println!("Temps du script {}s", start_time.elapsed().as_secs_f64());
 }
