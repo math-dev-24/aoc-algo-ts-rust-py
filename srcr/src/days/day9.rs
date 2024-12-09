@@ -45,9 +45,7 @@ impl ParseDiskResult {
         if start >= end  || end > self.disk.len() {
             panic!("Tentative impossible - start: {} - end {}", start, end);
         }
-        for i in start..end {
-            self.disk[i] = value;
-        }
+        self.disk[start..end].fill(value);
     }
 }
 
