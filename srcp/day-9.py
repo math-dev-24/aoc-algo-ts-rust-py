@@ -1,5 +1,5 @@
 import time
-from srcp.utils.input import get_data
+# from srcp.utils.input import get_data
 
 
 def parse_disk_map(disk):
@@ -24,11 +24,10 @@ def move_whole_files(tmp_disk, tmp_file, tmp_free_blocks):
     tmp_file.sort(key=lambda x: x[0], reverse=True)
 
     for file_id, start, size in tmp_file:
-        file_positions = range(start, start + size)
 
         free_start = None
         for index, (free_start_pos, free_size) in enumerate(tmp_free_blocks):
-            if free_size >= size and free_start_pos <= file_positions[0]:
+            if free_size >= size and free_start_pos <= start:
                 free_start = free_start_pos
                 if free_size == size:
                     tmp_free_blocks.pop(index)
@@ -37,21 +36,17 @@ def move_whole_files(tmp_disk, tmp_file, tmp_free_blocks):
                 break
 
         if free_start is not None:
-            for pos in file_positions:
-                tmp_disk[pos] = "."
-            for j in range(size):
-                tmp_disk[free_start + j] = file_id
-            tmp_free_blocks.append([start, size])
-            tmp_free_blocks.sort(key=lambda x: x[0])
+            tmp_disk[start:start + size] = ['.'] * size
+            tmp_disk[free_start:free_start + size] = [file_id] * size
 
-            print(f"Moved file {file_id} to {free_start} - Disk state: {''.join(map(str, tmp_disk))}")
+            # print(f"Moved file {file_id} to {free_start} - Disk state: {''.join(map(str, tmp_disk))}")
 
     return tmp_disk
 
 
 time_start = time.time()
-# disk_map = "2333133121414131402"
-disk_map = get_data(2024, 9)
+disk_map = "2333133121414131402"
+# disk_map = get_data(2024, 9)
 
 disk_data, file_data, free_blocks = parse_disk_map(disk_map)
 compacted_data = move_whole_files(disk_data, file_data, free_blocks)

@@ -3,7 +3,7 @@ dotenv.config();
 
 const request = require('sync-request');
 
-export async function getInput(year: number, day: number) {
+export default async function getInput(year: number, day: number) {
     console.log(`Récupération de l'entrée pour le jour ${day} de l'année ${year}...`);
     const url: string = `${process.env.URL}/${year}/day/${day}/input`;
     const res = request('GET', url, {

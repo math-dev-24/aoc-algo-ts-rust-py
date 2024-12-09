@@ -1,4 +1,4 @@
-export function combinations<T>(array: T[], r: number): T[][] {
+export default function combinations<T>(array: T[], r: number): T[][] {
     const result: T[][] = [];
     const n = array.length;
 

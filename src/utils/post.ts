@@ -1,7 +1,7 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-export async function postAnswer(day: number, level: number, answer: string): Promise<void> {
+export default async function postAnswer(day: number, level: number, answer: string): Promise<void> {
     const year: number = new Date().getFullYear();
 
     try {

@@ -4,7 +4,7 @@ mod utils;
 use std::time::Instant;
 use utils::input::Input;
 
-use crate::days::day8::solve_day_8;
+use crate::days::day9::solve_day_9;
 
 #[tokio::main]
 async fn main() {
@@ -16,6 +16,6 @@ async fn main() {
     println!("Récupération des données...OK");
     println!("Début du script...");
     let start_time: Instant = Instant::now();
-    solve_day_8(&get_input);
+    solve_day_9(&get_input);
     println!("Temps du script {}s", start_time.elapsed().as_secs_f64());
 }
