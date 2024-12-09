@@ -1,59 +1,62 @@
 import time
-
 from srcp.utils.input import get_data
 
 
 def parse_disk_map(disk):
+    file_data = []
     tmp_disk = []
-    index = 0
+    free_blocks = []
+    current_position = 0
     for i, length in enumerate(map(int, disk)):
         if i % 2 == 0:
-            tmp_disk.extend([i // 2] * length)
-            index += 1
+            file_id = i // 2
+            file_data.append([file_id, current_position, length])
+            tmp_disk.extend([file_id] * length)
         else:
+            free_blocks.append([current_position, length])
             tmp_disk.extend(["."] * length)
-    return tmp_disk, index - 1
+        current_position += length
+
+    return tmp_disk, file_data, free_blocks
 
 
-def move_whole_files(disk_data, quantity: int):
-    for file_id in range(quantity, -1, -1):
-        file_positions = [i for i, block in enumerate(disk_data) if block == file_id]
-        if not file_positions:
-            continue
-        file_size = len(file_positions)
-        #print(f"File {file_id} size : {file_size}")
+def move_whole_files(tmp_disk, tmp_file, tmp_free_blocks):
+    tmp_file.sort(key=lambda x: x[0], reverse=True)
+
+    for file_id, start, size in tmp_file:
+        file_positions = range(start, start + size)
 
         free_start = None
-        #print(f"Index start : {index_start}")
-        #print(f"File positions : {file_positions}")
-        for i in range(file_positions[-1]):
-            list_blocks = disk_data[i:i + file_size]
-            if all(block == "." for block in list_blocks) and len(list_blocks) == file_size:
-                # print(i)
-                free_start = i
+        for index, (free_start_pos, free_size) in enumerate(tmp_free_blocks):
+            if free_size >= size and free_start_pos <= file_positions[0]:
+                free_start = free_start_pos
+                if free_size == size:
+                    tmp_free_blocks.pop(index)
+                else:
+                    tmp_free_blocks[index] = [free_start_pos + size, free_size - size]
                 break
 
         if free_start is not None:
-            #print(f" move {file_id}")
             for pos in file_positions:
-                disk_data[pos] = "."
-            for j in range(file_size):
-                disk_data[free_start + j] = file_id
-            # print(disk_data)
+                tmp_disk[pos] = "."
+            for j in range(size):
+                tmp_disk[free_start + j] = file_id
+            tmp_free_blocks.append([start, size])
+            tmp_free_blocks.sort(key=lambda x: x[0])
 
-    return disk_data
+            print(f"Moved file {file_id} to {free_start} - Disk state: {''.join(map(str, tmp_disk))}")
+
+    return tmp_disk
 
 
 time_start = time.time()
 # disk_map = "2333133121414131402"
 disk_map = get_data(2024, 9)
-disk_data, quantity = parse_disk_map(disk_map)
-# print("Disk data :", disk_data)
-# print("Quantity :", quantity)
 
-compacted_data = move_whole_files(disk_data, quantity)
-# print("Compacted data :", compacted_data)
+disk_data, file_data, free_blocks = parse_disk_map(disk_map)
+compacted_data = move_whole_files(disk_data, file_data, free_blocks)
 
+# Calcul du checksum
 checksum = sum(i * block for (i, block) in enumerate(compacted_data) if block != ".")
 
 print("Resultat :", checksum)
