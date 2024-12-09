@@ -10,7 +10,7 @@ use crate::days::day9::solve_day_9;
 async fn main() {
     let input = Input::new();
     let year = 2024;
-    let day = 8;
+    let day = 9;
     println!("Récupération des données...[year:{},day:{}]", &year, &day);
     let get_input = input.get_input(year, day).await;
     println!("Récupération des données...OK");
