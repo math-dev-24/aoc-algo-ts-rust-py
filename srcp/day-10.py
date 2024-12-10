@@ -24,10 +24,7 @@ def explore_distinct_trails(grid: list[list[int]], x: int, y: int, visited: set)
 
 def calculate_rating(grid: list[list[int]]) -> int:
     trailheads = [(x, y) for x in range(len(grid)) for y in range(len(grid[0])) if grid[x][y] == 0]
-    total_rating: int = 0
-    for x, y in trailheads:
-        total_rating += explore_distinct_trails(grid, x, y, set())
-    return total_rating
+    return sum(explore_distinct_trails(grid, x, y, set()) for x, y in trailheads)
 
 
 grid = [list(map(int, i)) for i in get_data(2024, 10).strip().splitlines()]

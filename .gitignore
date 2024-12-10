@@ -5,3 +5,4 @@ srcr/target/
 **/data.txt
 .idea
 */.idea
+srcp/utils/__pycache__
