@@ -3,11 +3,11 @@ export default function solve_day_11(input: string): number {
     const initialStones: number[] = input.split(" ").map(Number);
 
 
-    const blinks: number = 75;
-    const result = simulateStonesOptimized(initialStones, blinks);
+    const result: number = simulateStones_part_1(initialStones, 25);
+    const result_part_2: number = simulateStonesOptimized(initialStones, 75);
 
-    console.log(`Nombre de pierres après ${blinks} clignements : ${result}`);
-
+    console.log(`Nombre de pierres après 25 clignements : ${result}`);
+    console.log(`Nombre de pierres après 75 clignements : ${result_part_2}`);
     return 0;
 }
 
@@ -22,15 +22,14 @@ function simulateStones_part_1(initialStones: number[], blinks: number): number 
                 newStones.push(1);
             } else if (stone.toString().length % 2 === 0) {
                 const stoneStr = stone.toString();
-                const half = stoneStr.length / 2;
-                const left = parseInt(stoneStr.slice(0, half), 10);
-                const right = parseInt(stoneStr.slice(half), 10);
+                const half: number = stoneStr.length / 2;
+                const left: number = parseInt(stoneStr.slice(0, half), 10);
+                const right: number = parseInt(stoneStr.slice(half), 10);
                 newStones.push(left, right);
             } else {
                 newStones.push(stone * 2024);
             }
         }
-
         stones = newStones;
     }
     return stones.length;
@@ -44,19 +43,18 @@ function simulateStonesOptimized(initialStones: number[], blinks: number): numbe
     }
 
     for (let i = 0; i < blinks; i++) {
-        // Valeur  / Quantité de pierres
         const newStoneCounts: Record<number, number> = {};
 
         for (const [stoneStr, count] of Object.entries(stoneCounts)) {
-            const stone = parseInt(stoneStr, 10);
+            const stone: number = parseInt(stoneStr, 10);
 
             if (stone === 0) {
                 newStoneCounts[1] = (newStoneCounts[1] || 0) + count;
             } else if (stone.toString().length % 2 === 0) {
-                const stoneStr = stone.toString();
-                const half = stoneStr.length / 2;
-                const left = parseInt(stoneStr.slice(0, half), 10);
-                const right = parseInt(stoneStr.slice(half), 10);
+                const stoneStr: string = stone.toString();
+                const half: number = stoneStr.length / 2;
+                const left: number = parseInt(stoneStr.slice(0, half), 10);
+                const right: number = parseInt(stoneStr.slice(half), 10);
 
                 newStoneCounts[left] = (newStoneCounts[left] || 0) + count;
                 newStoneCounts[right] = (newStoneCounts[right] || 0) + count;
