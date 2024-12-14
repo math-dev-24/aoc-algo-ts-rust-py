@@ -1,21 +1,24 @@
+export function solve_day_3(input: string): number {
+    const data_day_3: string = input.trim();
 
-c
+    const mulPattern: RegExp = /mul\((\d+),(\d+)\)/g;
+    const controlPattern: RegExp = /do\(\)|don't\(\)/g;
 
-const data_day_3 = fs.readFileSync(path.join(__dirname, './data.txt'), 'utf8').trim();
+    const mulls: any[] = [...data_day_3.matchAll(mulPattern)];
+    const controls: any[] = [...data_day_3.matchAll(controlPattern)];
 
-const mulPattern: RegExp = /mul\((\d+),(\d+)\)/g;
-const controlPattern: RegExp = /do\(\)|don't\(\)/g;
+    let result: number = 0;
 
-const mulls: any[] = [...data_day_3.matchAll(mulPattern)];
-const controls: any[] = [...data_day_3.matchAll(controlPattern)];
+    mulls.forEach(mull => {
+        let tmp_control = controls.filter((control): boolean => control.index < mull.index + 1).pop();
+        if(!tmp_control) tmp_control = {index: 0, input: "do()"};
+        if(tmp_control[0] == "don't()") return;
+        result += parseInt(mull[1], 10) * parseInt(mull[2], 10);
+    });
 
-let result: number = 0;
+    console.log("Resultat : ", result);
 
-mulls.forEach(mull => {
-    let tmp_control = controls.filter((control): boolean => control.index < mull.index + 1).pop();
-    if(!tmp_control) tmp_control = {index: 0, input: "do()"};
-    if(tmp_control[0] == "don't()") return;
-    result += parseInt(mull[1], 10) * parseInt(mull[2], 10);
-});
+    return result;
+}
 
-console.log("Resultat : ", result);
+
