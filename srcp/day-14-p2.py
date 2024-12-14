@@ -1,77 +1,67 @@
 import re
-import matplotlib
 import matplotlib.pyplot as plt
 from srcp.utils.input import get_data
 
-matplotlib.use('macOSX')
+WIDTH: int = 101
+HEIGHT: int = 103
+
+data: str = get_data(day=14, year=2024)
+
+# Parsing des données
+robots: list[dict[str, list[int]]] = []
+
+for line in data.strip().split('\n'):
+    match = re.findall(r'-?\d+,-?\d+', line)
+    position: list[int] = list(map(int, match[0].split(',')))
+    velocity: list[int] = list(map(int, match[1].split(',')))
+    robots.append({"p": position, "v": velocity})
 
 
-def solve(robots):
-    w, h = 101, 103
+def next_position(r: dict[str, list[int]]):
+    x_final = (r["p"][0] + r["v"][0]) % WIDTH
+    y_final = (r["p"][1] + r["v"][1]) % HEIGHT
+    return x_final, y_final
+
+
+def part_2(robots: list[dict[str, list[int]]]) -> int:
     states = set()
-    answer = 0
+    time_s = 0
 
     while True:
-        answer += 1
+        time_s += 1
 
+        # Mettre à jour les positions
         for robot in robots:
-            p = robot["p"]
-            v = robot["v"]
+            p, v = robot["p"], robot["v"]
+            p[0], p[1] = next_position(robot)
 
-            p[0] += v[0]
-            while p[0] < 0:
-                p[0] += w
-            while p[0] >= w:
-                p[0] -= w
+        points = [tuple(robot["p"]) for robot in robots]
 
-            p[1] += v[1]
-            while p[1] < 0:
-                p[1] += h
-            while p[1] >= h:
-                p[1] -= h
-
-        pt = [tuple(robot["p"]) for robot in robots]
-        if len(set(pt)) == len(pt):
+        # Break si les positions sont uniques
+        if len(set(points)) == len(points):
             break
 
-        s = frozenset(pt)
+        # Break si on revient à un état précédent
+        s = frozenset(points)
         if s in states:
             break
 
         states.add(s)
 
+    # Tracer les points
     fig, ax = plt.subplots(figsize=(10, 6))
-    for i in range(h):
-        for j in range(w):
-            if (j, i) in pt:
-                ax.plot(j, i, "s", color="blue")
+    for x, y in points:
+        ax.plot(x, y, "s", color="green")
 
-    ax.set_xlim(0, w)
-    ax.set_ylim(0, h)
+    ax.set_xlim(0, WIDTH)
+    ax.set_ylim(0, HEIGHT)
     ax.invert_yaxis()
-    ax.set_title(f"{answer} seconds")
-    plt.savefig("rp.png")
+    ax.set_title(f"{time_s} seconds")
+    plt.savefig("sapin.png")
     plt.close()
 
-    return answer
+    return time_s
 
 
-data: str = get_data(2024, 14)
-
-robots = []
-
-
-def parse_robot(r: str):
-    match = re.findall(r'-?\d+,-?\d+', r)
-    position = match[0].split(',')
-    velocity = match[1].split(',')
-    x, y = int(position[0]), int(position[1])
-    vx, vy = int(velocity[0]), int(velocity[1])
-    return {"p": [x, y], "v": [vx, vy]}
-
-
-for line in data.strip().split('\n'):
-    robots.append(parse_robot(line))
-
-steps = solve(robots)
+steps: int = part_2(robots)
 print(f"Part 2: {steps}")

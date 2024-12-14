@@ -22,19 +22,19 @@ def parse_robot(r: str):
 for line in data.strip().split('\n'):
     robots.append(parse_robot(line))
 
-width = 101
-mid_x = width // 2
+width: int = 101
+mid_x: int = width // 2
 
-height = 103
-mid_y = height // 2
+height: int = 103
+mid_y: int = height // 2
 
 
 position_final = defaultdict(int)
 
 
-def calculate_final_position(r):
-    x_final = (r['x'] + r['vx'] * 100) % width
-    y_final = (r['y'] + r['vy'] * 100) % height
+def calculate_final_position(r: dict[str, int], tmp_pos: int = 100) -> None:
+    x_final = (r['x'] + r['vx'] * tmp_pos) % width
+    y_final = (r['y'] + r['vy'] * tmp_pos) % height
     position_final[(x_final, y_final)] += 1
 
 
@@ -51,6 +51,7 @@ quadrants = {
 for (x, y), count in position_final.items():
     if x == mid_x or y == mid_y:
         continue
+    # je check pour chaques quadrant
     if x < mid_x and y < mid_y:
         quadrants["top_left"] += count
     elif x >= mid_x and y < mid_y:
@@ -67,15 +68,7 @@ safety_factor = (
         * quadrants["bottom_right"]
 )
 
-# Résultats
-print("Positions des robots après 100 secondes :")
-for y in range(height):
-    row = ""
-    for x in range(width):
-        row += str(position_final[(x, y)]) if (x, y) in position_final else "."
-    print(row)
-
-print("\nNombre de robots par quadrant :")
+print("Nombre de robots par quadrant :")
 for quadrant, count in quadrants.items():
     print(f"{quadrant}: {count} robots")
 
