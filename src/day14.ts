@@ -106,6 +106,15 @@ export function solve_day_14(input: string): number {
     }
     console.log(`Temps : ${time_s}`);
 
+    let map: string[][] = Array.from({ length: HEIGHT }, () => Array(WIDTH).fill("."));
+
+    for(const robot of robots) {
+        const { x, y } = robot.position;
+        map[y][x] = "|";
+    }
+
+    console.log(map.map(row => row.join("")).join("\n"));
+
 
     return 0;
 }
