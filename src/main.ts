@@ -1,6 +1,6 @@
 import getInput from './utils/input';
 import postAnswer from "./utils/post";
-import {solve_day_15} from "./day15";
+import {solve_day_15_p2} from "./day15-p2";
 
 
 
@@ -14,7 +14,7 @@ async function main() {
     console.log("Données d'entrées récupérées");
     console.log("Calcul en cours...");
     const start: number = new Date().getTime();
-    const res = solve_day_15(data);
+    const res = solve_day_15_p2(data);
     console.log("Temps de calcul : ", (new Date().getTime() - start) / 1000, "s");
 
     if (sendData && (level === 1 || level === 2)) {
