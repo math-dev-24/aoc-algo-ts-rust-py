@@ -1,5 +1,4 @@
 from collections import defaultdict
-
 from srcp.utils.input import get_data
 
 

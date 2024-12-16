@@ -2,7 +2,6 @@ from srcp.utils.input import get_data
 
 data = get_data(2024, 15)
 
-
 def part2(data):
     grid = []
     moves = ""
