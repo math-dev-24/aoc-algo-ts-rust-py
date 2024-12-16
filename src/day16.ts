@@ -3,74 +3,128 @@ interface Point {
     col: number;
 }
 
-type Direction = "N" | "E" | "S" | "W";
+interface Direction {
+    row: number;
+    col: number;
+}
 
-interface State {
-    position: Point;
-    direction: Direction;
-    score: number;
+interface Node {
+    cost: number;
+    row: number;
+    col: number;
+    directionIndex: number;
+    path: Point[];
 }
 
 export function solve_day16(input: string): number {
     const grid: string[][] = input.split("\n").map(line => line.split(""));
-    const directions: Direction[] = ["N", "E", "S", "W"];
-    const deltas: Record<Direction, [number, number]> = {
-        "N": [-1, 0],
-        "E": [0, 1],
-        "S": [1, 0],
-        "W": [0, -1],
+    const dirs: Direction[] = [
+        { row: 0, col: 1 },
+        { row: 1, col: 0 },
+        { row: 0, col: -1 },
+        { row: -1, col: 0 }
+    ];
+
+    const isValid = (row: number, col: number): boolean => {
+        return row >= 0 && row < grid.length && col >= 0 && col < grid[0].length && grid[row][col] !== "#";
     };
 
-    let start: Point = { row: 0, col: 0 };
-    let end: Point = { row: 0, col: 0 };
+    let start: Point | null = null;
+    let end: Point | null = null;
 
     for (let i = 0; i < grid.length; i++) {
-        for (let j = 0; j < grid[i].length; j++) {
-            if (grid[i][j] === "S") start = { row: i, col: j };
-            if (grid[i][j] === "E") end = { row: i, col: j };
-        }
-    }
-
-    const queue: State[] = [];
-    queue.push({ position: start, direction: "N", score: 0 });
-
-    const visited = new Set<string>();
-    let bestScore = Infinity;
-
-    while (queue.length > 0) {
-        queue.sort((a, b) => a.score - b.score);
-        const { position, direction, score } = queue.shift()!;
-
-        const key: string = `${position.row},${position.col},${direction}`;
-        if (visited.has(key)) continue;
-
-        visited.add(key);
-
-        if (position.row === end.row && position.col === end.col) {
-            bestScore = Math.min(bestScore, score);
-            continue;
-        }
-
-        for (const dir of directions) {
-            const [dRow, dCol] = deltas[dir];
-            const newRow = position.row + dRow;
-            const newCol = position.col + dCol;
-
-            if (
-                newRow >= 0 &&
-                newRow < grid.length &&
-                newCol >= 0 &&
-                newCol < grid[0].length &&
-                grid[newRow][newCol] !== "#"
-            ) {
-                queue.push({
-                    position: { row: newRow, col: newCol },
-                    direction: dir,
-                    score: score + (dir === direction ? 1 : 1000),
-                });
+        for (let j = 0; j < grid[0].length; j++) {
+            if (grid[i][j] === "S") {
+                start = { row: i, col: j };
+            } else if (grid[i][j] === "E") {
+                end = { row: i, col: j };
             }
         }
     }
-    console.log(bestScore);
-    return bestScore === Infinity ? -1 : bestScore;
+
+    if (!start || !end) {
+        throw new Error("Invalid input");
+    }
+
+    const queue: Node[] = [{
+        cost: 0,
+        row: start.row,
+        col: start.col,
+        directionIndex: 0,
+        path: []
+    }];
+    const visited: Record<string, number> = {};
+    const successfulPathsCells: Set<string> = new Set();
+    let bestPaths: Point[][] = [];
+    let minCost: number = Infinity;
+
+    while (queue.length > 0) {
+        const { cost, row, col, directionIndex, path } = queue.shift()!;
+
+        // Unique key for visited
+        const key = `${row},${col},${directionIndex}`;
+        if (visited[key] !== undefined && visited[key] < cost) {
+            continue;
+        }
+        visited[key] = cost;
+
+        const newPath = [...path, { row, col }];
+
+        if (row === end.row && col === end.col) {
+            if (cost < minCost) {
+                minCost = cost;
+                bestPaths = [newPath];
+            } else if (cost === minCost) {
+                bestPaths.push(newPath);
+            }
+            continue;
+        }
+
+        // Move forward in the same direction
+        const { row: dr, col: dc } = dirs[directionIndex];
+        const newRow = row + dr;
+        const newCol = col + dc;
+
+        if (isValid(newRow, newCol)) {
+            queue.push({
+                cost: cost + 1,
+                row: newRow,
+                col: newCol,
+                directionIndex,
+                path: newPath
+            });
+        }
+
+        queue.push({
+            cost: cost + 1000,
+            row,
+            col,
+            directionIndex: (directionIndex + 1) % 4,
+            path: newPath
+        });
+
+        queue.push({
+            cost: cost + 1000,
+            row,
+            col,
+            directionIndex: (directionIndex + 3) % 4,
+            path: newPath
+        });
+    }
+
+    for (const path of bestPaths) {
+        for (const { row, col } of path) {
+            successfulPathsCells.add(`${row},${col}`);
+        }
+    }
+    for (const cell of successfulPathsCells.values()) {
+        const [row, col] = cell.split(",");
+        grid[Number(row)][Number(col)] = "O";
+    }
+
+    console.log(`Partie 1 : ${minCost}`);
+    console.log(`Partie 2 : ${successfulPathsCells.size}`);
+    console.log(grid.map(row => row.join("")).join("\n"));
+
+    return successfulPathsCells.size;
 }
