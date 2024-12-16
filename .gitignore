@@ -6,3 +6,4 @@ srcr/target/
 .idea
 */.idea
 srcp/utils/__pycache__
+venv
