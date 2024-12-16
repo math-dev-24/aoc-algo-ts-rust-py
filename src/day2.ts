@@ -6,7 +6,7 @@ export const solve_day_2 = (input: string): number => {
 
 // Algo : O(n2)
     for (const line of data_day_2) {
-        const tmp_line: number[] = line.split(" ").map((num: string) => parseInt(num, 10));
+        const tmp_line: number[] = line.split(" ").map(Number);
 
         const is_valid = (arr: number[]): {validity: boolean, error: number} => {
             const direction: 1|-1 = arr[1] > arr[0] ? 1 : -1;

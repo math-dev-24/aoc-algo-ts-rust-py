@@ -3,8 +3,6 @@ export function solve_day_1(input: string): number {
 
     const sorted = (a: number, b: number) => a - b;
 
-    console.log(`nombre de lignes :`, data_day_1.length);
-
     const deck_1: number[] = [];
     const deck_2: number[] = [];
 
@@ -14,14 +12,14 @@ export function solve_day_1(input: string): number {
         deck_2.push(parseInt(tmp_2, 10));
     }
 
-// Algo : O(n)
+// Algo : O(n) je boucle x fois par élément
     function part_1(deck_1: number[], deck_2: number[]): number {
         return deck_1.reduce((total: number, num: number, index: number) => {
             return total + Math.abs(num - deck_2[index]);
         }, 0);
     }
 
-// Algo : O(n)
+// Algo : O(n) je boucle x fois par élément
     function part_2(deck_1: number[], deck_2: number[]): number {
         const count_map: Map<number, number> = new Map();
         for (const num of deck_2) {

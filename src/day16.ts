@@ -61,7 +61,6 @@ export function solve_day16(input: string): number {
     while (queue.length > 0) {
         const { cost, row, col, directionIndex, path } = queue.shift()!;
 
-        // Unique key for visited
         const key = `${row},${col},${directionIndex}`;
         if (visited[key] !== undefined && visited[key] < cost) {
             continue;

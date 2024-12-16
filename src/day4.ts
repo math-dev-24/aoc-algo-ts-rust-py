@@ -9,11 +9,6 @@ export function solve_day_4(input: string): number {
     return 0;
 }
 
-
-
-
-
-
 // PART 1
 function findXMAS(grid: string[][], search: string): number {
     let result: number = 0;
@@ -34,7 +29,7 @@ function findXMAS(grid: string[][], search: string): number {
     for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
             for (const [dr, dc] of directions) {
-                if (is_word_found(row, col, dr, dc, search)){
+                if (is_word_found(row, col, dr, dc, search)) {
                     result++;
                 }
             }
@@ -44,7 +39,7 @@ function findXMAS(grid: string[][], search: string): number {
 }
 
 function is_word_found(row: number, col: number, dir_row: number, dir_col: number, search: string): boolean {
-    for (let i = 0; i < search.length; i++){
+    for (let i = 0; i < search.length; i++) {
         const tmp_row: number = row + i * dir_row;
         const tmp_col: number = col + i * dir_col;
 
