@@ -8,8 +8,9 @@ Site de l'organisation : [AOC](https://adventofcode.com/)
 - Apprentissage de rust
 
 ## Liste des réfléxions par jour
-- [Jour 12](./analyses/day12)
-- [Jour 13](./analyses/day13)
-- [Jour 14](./analyses/day14)
-- [Jour 15](./analyses/day15)
+- [Jour 11](./analyses/day11.md)
+- [Jour 12](./analyses/day12.md)
+- [Jour 13](./analyses/day13.md)
+- [Jour 14](./analyses/day14.md)
+- [Jour 15](./analyses/day15.md)
 - [Jour 16](./analyses/day16.md)
