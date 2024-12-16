@@ -3,7 +3,7 @@ dist/
 /.env
 srcr/target/
 **/data.txt
-.idea
-*/.idea
 srcp/utils/__pycache__
 venv
+.idea
+.DS_Store
