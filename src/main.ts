@@ -1,12 +1,12 @@
 import getInput from './utils/input';
 import postAnswer from "./utils/post";
-import {solve_day_15_p2} from "./day15-p2";
+import {solve_day16} from "./day16";
 
 
 
 
 async function main() {
-    const day: number = 15;
+    const day: number = 16;
     const sendData: boolean = false;
     const level: number = 1;
 
@@ -14,7 +14,7 @@ async function main() {
     console.log("Données d'entrées récupérées");
     console.log("Calcul en cours...");
     const start: number = new Date().getTime();
-    const res = solve_day_15_p2(data);
+    const res = solve_day16(data);
     console.log("Temps de calcul : ", (new Date().getTime() - start) / 1000, "s");
 
     if (sendData && (level === 1 || level === 2)) {
