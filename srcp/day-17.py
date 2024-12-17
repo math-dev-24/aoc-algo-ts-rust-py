@@ -25,11 +25,11 @@ def get_combo(op: int, a: int, b: int, c: int) -> int:
     return op
 
 
-def dv(register: int, op: int, a, b, c) -> int:
+def dv(register: int, op: int, a: int, b: int, c: int) -> int:
     return register >> get_combo(op, a, b, c)
 
 
-def get_output(prog: list[int], a: int = 0, b: int = 0, c: int = 0, part_2: bool = False) -> str:
+def get_output(prog: list[int], a: int = 0, b: int = 0, c: int = 0) -> list[int]:
     pointer: int = 0
     outs: list[int] = []
 
@@ -52,24 +52,31 @@ def get_output(prog: list[int], a: int = 0, b: int = 0, c: int = 0, part_2: bool
                 b ^= c
             case 'out':
                 outs.append(combo & 7)
-                if part_2 and outs[-1] != prog[len(outs) - 1]:
-                    return ",".join(map(str, outs))
             case 'bdv':
                 b = dv(a, operand, a, b, c)
             case 'cdv':
                 c = dv(a, operand, a, b, c)
         # print(f"Pointer: {pointer}, A: {a}, B: {b}, C: {c}, Output: {outs}")
         pointer += 2
-    return ",".join(map(str, outs))
+    return outs
 
 
 # partie 1
 outputs = get_output(program, register_1, register_2, register_3)
-print(program)
-print(outputs)
+print(",".join(map(str, outputs)))
 
 # Partie 2
-print("Partie 2")
-print(f"Nombre de cycle : {len(program)} de 12")  # 16 sorties donc 16 cycles de 0,2,4,6 a 12
 
-print(get_output(program, 13535676351843, register_2, register_3))
+candidates: list[int] = [0]
+
+for i in range(1, len(program) + 1):
+    out = []
+    for c in candidates:
+        for offset in range(2 ** 3):
+            #  2**3 -> 8 dernier bits
+            a = (2 ** 3) * c + offset
+            if get_output(program, a, register_2, register_3) == program[-i:]:
+                out.append(a)
+    candidates = out
+
+print(min(candidates))
