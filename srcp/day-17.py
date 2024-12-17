@@ -27,7 +27,7 @@ def get_combo(op: int, a: int, b: int, c: int) -> int:
 
 
 def dv(register: int, op: int, a, b, c) -> int:
-    return register // (2 ** get_combo(op, a, b, c))
+    return register >> get_combo(op, a, b, c)
 
 
 def get_output(prog: list[int], a: int = 0, b: int = 0, c: int = 0, part_2: bool = False) -> str:
@@ -49,7 +49,7 @@ def get_output(prog: list[int], a: int = 0, b: int = 0, c: int = 0, part_2: bool
             case 'bxl':
                 b ^= operand
             case 'bst':
-                b = combo % 8
+                b = combo & 7
             case 'jnz':
                 if a != 0:
                     pointer = operand
@@ -57,7 +57,7 @@ def get_output(prog: list[int], a: int = 0, b: int = 0, c: int = 0, part_2: bool
             case 'bxc':
                 b ^= c
             case 'out':
-                outs.append(combo % 8)
+                outs.append(combo & 7)
                 if part_2 and outs[-1] != int(prog[len(outs) - 1]):
                     return ",".join(map(str, outs))
             case 'bdv':
@@ -77,31 +77,35 @@ print(outputs)
 # brut force
 def find_potential_a(s: int, e: int) -> list[int]:
     results = []
-    for a in range(s, e + 1):
-        b2 = (a % 8) ^ 3
-        c = a // (2 ** b2)
-        b_val = (((a % 8) ^ 3) ^ 5) ^ c
-        if b_val % 8 == program[0]:
-            results.append(a)
+    p0 = program[0]
+    for x in range(s, e + 1):
+        mod8 = x & 7
+        b2 = mod8 ^ 3
+        c = x >> b2
+        b_val = ((mod8 ^ 3) ^ 5) ^ c
+        if (b_val & 7) == p0:
+            results.append(x)
     return results
 
 
 is_ok: bool = False
 start: int = 0
-end: int = 1000
 delta: int = 100
 f: int = 0
 
-while True:
-    potential_a: list[int] = find_potential_a(start + f*delta, end + f*delta)
-    print(len(potential_a))
+while not is_ok:
+    s = start + f * delta
+    e = s + delta
+    potential_a: list[int] = find_potential_a(s, e)
+    f += 1
+
     for a in potential_a:
-        output: str = get_output(program, a, register_2, register_3, part_2=True)
+        output: str = get_output(program, a ** 9, register_2, register_3, part_2=True)
         if output == target_output:
             is_ok = True
             print(f"A = {a}")
             break
 
-
 if not is_ok:
     print("Pas trouvé")
+
