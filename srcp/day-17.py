@@ -68,14 +68,19 @@ print(",".join(map(str, outputs)))
 # Partie 2
 
 candidates: list[int] = [0]
-
+print(program)
 for i in range(1, len(program) + 1):
+    print("------")
+    print(f"Pour {program[-i:]}")
     out = []
     for c in candidates:
+        print(f"Candidat : {c}")
         for offset in range(2 ** 3):
             #  2**3 -> 8 dernier bits
             a = (2 ** 3) * c + offset
-            if get_output(program, a, register_2, register_3) == program[-i:]:
+            outs = get_output(program, a, register_2, register_3)
+            if outs == program[-i:]:
+                print(f"A valid pour {program[-i:]} == {outs} -> {a}")
                 out.append(a)
     candidates = out
 
