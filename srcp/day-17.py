@@ -73,13 +73,4 @@ print("Partie 2")
 print(f"Nombre de cycle : {len(program)} de 12")  # 16 sorties donc 16 cycles de 0 a 12
 
 
-def find_initial_A(output_sequence, divisor=8):
-    n_cycles = len(output_sequence)
-    final_a = 1
-    initial_a = final_a * (divisor ** n_cycles)
-    return initial_a
-
-
-initial_a = find_initial_A(program)
-
-print("Valeur initiale de A estimée :", initial_a)
+print("Valeur initiale de A estimée :", 8**16)
