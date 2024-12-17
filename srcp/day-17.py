@@ -65,25 +65,11 @@ def get_output(prog: list[int], a: int = 0, b: int = 0, c: int = 0, part_2: bool
 
 # partie 1
 outputs = get_output(program, register_1, register_2, register_3)
+print(program)
 print(outputs)
 
 # Partie 2
 print("Partie 2")
 print(f"Nombre de cycle : {len(program)} de 12")  # 16 sorties donc 16 cycles de 0,2,4,6 a 12
 
-
-print("Valeur initiale de A estimée :", 8**16)
-
-test = get_output(program, 8**16, register_2, register_3)
-print(len(test))
-print(f"Valeur finale de A : {test}")
-
-start = 281474976710660
-f = 1
-while True:
-    out = get_output(program, start+f, register_2, register_3, part_2=True)
-    print(f"Test avec A = {start+f}, Output = {out}")
-    if out == target_output:
-        print(f"Solution trouvée : A = {start+f}")
-        break
-    f += 8
+print(get_output(program, 13535676351843, register_2, register_3))
