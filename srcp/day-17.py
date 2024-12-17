@@ -1,6 +1,5 @@
 from srcp.utils.input import get_data
 import re
-from concurrent.futures import ProcessPoolExecutor
 
 data = get_data(2024, 17)
 
@@ -59,7 +58,7 @@ def get_output(prog: list[int], a: int = 0, b: int = 0, c: int = 0, part_2: bool
                 b = dv(a, operand, a, b, c)
             case 'cdv':
                 c = dv(a, operand, a, b, c)
-        print(f"Pointer: {pointer}, A: {a}, B: {b}, C: {c}, Output: {outs}")
+        # print(f"Pointer: {pointer}, A: {a}, B: {b}, C: {c}, Output: {outs}")
         pointer += 2
     return ",".join(map(str, outs))
 
@@ -70,7 +69,21 @@ print(outputs)
 
 # Partie 2
 print("Partie 2")
-print(f"Nombre de cycle : {len(program)} de 12")  # 16 sorties donc 16 cycles de 0 a 12
+print(f"Nombre de cycle : {len(program)} de 12")  # 16 sorties donc 16 cycles de 0,2,4,6 a 12
 
 
 print("Valeur initiale de A estimée :", 8**16)
+
+test = get_output(program, 8**16, register_2, register_3)
+print(len(test))
+print(f"Valeur finale de A : {test}")
+
+start = 281474976710660
+f = 1
+while True:
+    out = get_output(program, start+f, register_2, register_3, part_2=True)
+    print(f"Test avec A = {start+f}, Output = {out}")
+    if out == target_output:
+        print(f"Solution trouvée : A = {start+f}")
+        break
+    f += 8
