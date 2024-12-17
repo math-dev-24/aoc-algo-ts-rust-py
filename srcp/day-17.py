@@ -9,7 +9,7 @@ lines: list[str] = data.splitlines()
 register_1: int = int(re.compile(r'Register A: (\d+)').findall(lines[0])[0])
 register_2: int = int(re.compile(r'Register B: (\d+)').findall(lines[1])[0])
 register_3: int = int(re.compile(r'Register C: (\d+)').findall(lines[2])[0])
-# Programme : [2, 4, 1, 3, 7, 5, 1, 5, 0, 3, 4, 2, 5, 5, 3, 0]
+# Programme toujours : [2, 4, 1, 3, 7, 5, 1, 5, 0, 3, 4, 2, 5, 5, 3, 0]
 program = list(map(int, re.compile(r'\d+').findall(lines[4])))
 target_output = ",".join(map(str, program))
 
@@ -33,13 +33,8 @@ def dv(register: int, op: int, a, b, c) -> int:
 def get_output(prog: list[int], a: int = 0, b: int = 0, c: int = 0, part_2: bool = False) -> str:
     pointer: int = 0
     outs: list[int] = []
-    visited_states = set()
-    while pointer < len(prog):
-        state = (pointer, a, b, c, len(outs))
-        if state in visited_states:
-            return ",".join(map(str, outs))
 
-        visited_states.add(state)
+    while pointer < len(prog):
         instruction: str = opcode[prog[pointer]]
         operand = prog[pointer + 1]
         combo = get_combo(operand, a, b, c)
@@ -58,12 +53,13 @@ def get_output(prog: list[int], a: int = 0, b: int = 0, c: int = 0, part_2: bool
                 b ^= c
             case 'out':
                 outs.append(combo & 7)
-                if part_2 and outs[-1] != int(prog[len(outs) - 1]):
+                if part_2 and outs[-1] != prog[len(outs) - 1]:
                     return ",".join(map(str, outs))
             case 'bdv':
                 b = dv(a, operand, a, b, c)
             case 'cdv':
                 c = dv(a, operand, a, b, c)
+        print(f"Pointer: {pointer}, A: {a}, B: {b}, C: {c}, Output: {outs}")
         pointer += 2
     return ",".join(map(str, outs))
 
@@ -72,40 +68,18 @@ def get_output(prog: list[int], a: int = 0, b: int = 0, c: int = 0, part_2: bool
 outputs = get_output(program, register_1, register_2, register_3)
 print(outputs)
 
-
 # Partie 2
-# brut force
-def find_potential_a(s: int, e: int) -> list[int]:
-    results = []
-    p0 = program[0]
-    for x in range(s, e + 1):
-        mod8 = x & 7
-        b2 = mod8 ^ 3
-        c = x >> b2
-        b_val = ((mod8 ^ 3) ^ 5) ^ c
-        if (b_val & 7) == p0:
-            results.append(x)
-    return results
+print("Partie 2")
+print(f"Nombre de cycle : {len(program)} de 12")  # 16 sorties donc 16 cycles de 0 a 12
 
 
-is_ok: bool = False
-start: int = 0
-delta: int = 100
-f: int = 0
+def find_initial_A(output_sequence, divisor=8):
+    n_cycles = len(output_sequence)
+    final_a = 1
+    initial_a = final_a * (divisor ** n_cycles)
+    return initial_a
 
-while not is_ok:
-    s = start + f * delta
-    e = s + delta
-    potential_a: list[int] = find_potential_a(s, e)
-    f += 1
 
-    for a in potential_a:
-        output: str = get_output(program, a ** 9, register_2, register_3, part_2=True)
-        if output == target_output:
-            is_ok = True
-            print(f"A = {a}")
-            break
+initial_a = find_initial_A(program)
 
-if not is_ok:
-    print("Pas trouvé")
-
+print("Valeur initiale de A estimée :", initial_a)
