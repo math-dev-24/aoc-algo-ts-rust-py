@@ -41,7 +41,7 @@ current_position: tuple[int, int] = start
 
 # Partie 1 : Générer la grille des 1024 premier bytes
 # objectif même chose que depuis quelques semaile chercher le chemin de sortie
-for i, (x, y) in enumerate(bytes_positions[:1024]):
+for x, y in bytes_positions[:1024]:
     grid[y][x] = '#'
 
 print(f"Partie 1 : {shortest_path(grid, current_position, end)} pas.")
@@ -51,7 +51,7 @@ print(f"Partie 1 : {shortest_path(grid, current_position, end)} pas.")
 # Pas de blocage part 2 pas besoin de reset la grille
 blocking_byte: tuple[int, int]|None = None
 
-for i, (x, y) in enumerate(bytes_positions):
+for x, y in bytes_positions:
     grid[y][x] = '#'
     steps = shortest_path(grid, start, end)
     if steps == -1:
