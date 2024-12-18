@@ -10,7 +10,6 @@ register_2: int = int(re.compile(r'Register B: (\d+)').findall(lines[1])[0])
 register_3: int = int(re.compile(r'Register C: (\d+)').findall(lines[2])[0])
 # Programme toujours : [2, 4, 1, 3, 7, 5, 1, 5, 0, 3, 4, 2, 5, 5, 3, 0]
 program = list(map(int, re.compile(r'\d+').findall(lines[4])))
-target_output = ",".join(map(str, program))
 
 opcode: dict = {0: 'adv', 1: 'bxl', 2: 'bst', 3: 'jnz', 4: 'bxc', 5: 'out', 6: 'bdv', 7: 'cdv'}
 
@@ -73,6 +72,7 @@ for i in range(1, len(program) + 1):
     print("------")
     print(f"Pour {program[-i:]}")
     out = []
+
     for c in candidates:
         print(f"Candidat : {c}")
         for offset in range(2 ** 3):
