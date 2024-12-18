@@ -1,40 +1,60 @@
 # Jour 17 AOC
 
-## Partie 2 : Recherche du chemin inverse
+# Partie 2 : Recherche du chemin inverse
 
-### Contexte
-- Objectif : Remonter le cycle pour trouver une valeur initiale A qui valide une série de positions (mon programme == outputs).
-- Principe : Chaque cycle est décalé de 8 bits (équivalent à une multiplication par 2^3 ou 8)
-- Approche :
-  - Partir de la fin du programme (ex : [5, 5, 3, 0]).
-  - Rechercher des candidats A potentiels.
-  - Décaler les candidats de 8 bits pour trouver les valeurs du cycle précédent. 
-  - Répéter jusqu'à remonter à l'origine (0, puis 3, puis 5, ...).
+## Objectif
+Trouver A pour que les outputs correspondent au programme initial.
 
-### Objectif
 ![recherche](./assets/day_17.png)
 
-### Approfondissement
-Pour améliorer la performance utilisation d'opérateur [bitwise](https://wiki.python.org/moin/BitwiseOperators) :
-- Remplacer ``x % 8`` par ``x & 7``
-- Remplacer ``a // (2 ** b2)`` par ``a >> b2``
-- Remplacer ``b_val % 8`` par ``b_val & 7``
+
+## Principe de fonctionnement et analyse
+1. Structure du programme
+- Chaque cycle du programme contient 12 étapes (1 cycle = 1 output + pointer go to 0).
+- La valeur initiale ``A`` est divisée par environ 8 à chaque cycle (correspondant à un décalage de 3 bits) à chaque étape du cycle.
+2. Approche Adoptée :
+- Partir de la fin du programme pour reconstruire les candidats possibles pour ``A``.
+- Utiliser des décalages de bits (>> pour division par 8) et des masques binaires (& 7 pour modulo 8) pour optimiser les calculs.
 
 
-### Réfléxions premières
-Je ne sais pas comment faire j'essai d'analiser le cycle qui revient X * output.length
+## Approche du problème
+Je ne sais pas comment faire, j'essai d'analyser le cycle qui revient X * output.length (`` 16 outputs * 12 steps``)
+Je pensais faire un brut force en incrémentant la valeur de A et appelé la fonction, tous en breakant le programmme dès qu'une sortie ne correspond plus.
+Mais le nombre ``A`` est très important !
+<br>
+J'ai essayé de décomposer un cycle pour voir comment mon output est impacté en fonction de A.
+
+
 ![recherche](./assets/day_17_2.png)
 
-### Après apprfondissement
-Je part de la fin du programme, et on recherche le A possible.
-<br>
-Sachant qu'entre chaque cycle on décale de 8 bits (multiplier environs par 2^3  ou 8)
-<br>
-Donc j'ajoute le A dans les candidats qui lui devras être décaler de 8 bits et de 0 à 2^3 - 1, afin de trouver le A du cycle d'avant.
+## Etapes détaillées et approche adoptée
 
+1. Compréhension des cycles
+- À chaque étape :
+  - A est divisé par 8 : équivalent à un décalage de bits à droite (A >> 3).
+  - La sortie (output) est calculée via une opération binaire sur les 3 derniers bits (A & 7).
+Ces étapes sont répétées pour chaque instruction du programme.
+2. Je dois rechercher ``A``
+- Initialisation :
+  - On commence par le dernier output de la liste. 
+  - Les candidats pour A sont initialisés à [0].
+3. Processus itératif :
+- Pour chaque ``output``, je dois explorer toutes les combinaisons possibles de A (en tenant compte des 3 derniers bits) et tester leur validité.
+- Valider les candidats en comparant les sorties générées avec celles attendues.
+- Passer au cycle précédent en recalculant les valeurs de A possibles.
+
+4. Optimisations
+- Remplacer les opérations coûteuses comme le % et les divisions par des décalages et des masques binaires :
+  - x % 8 → x & 7
+  - a // (2 ** b) → a >> b
+- Cela améliore la performance lors de l'exploration exhaustive des candidats.
+- Cela s'appelle les opérateurs [bitwise](https://wiki.python.org/moin/BitwiseOperators)
+
+## Illustation
 
 ![recherche](./assets/day_17_3.png)
 
+## Recherche pratique
 Exemple script fonctionnel :
 <br>
 Mon programme : ``[2, 4, 1, 3, 7, 5, 1, 5, 0, 3, 4, 2, 5, 5, 3, 0]``
@@ -76,10 +96,12 @@ A valid pour [5, 5, 3, 0] == [5, 5, 3, 0] -> 3442
 etc...
 ```
 
-
 # Conclusion
-Approche principale : Remonter les cycles en utilisant des décalages de bits et des masques binaires.
+<b><u>Approche principale :</u></b>
+- Partir de la fin des sorties pour remonter les cycles.
+- Explorer les candidats possibles pour A en utilisant des décalages de bits.
+- Valider chaque candidat en générant les sorties correspondantes.
 <br>
-Optimisations : Utilisation d'opérations & (AND binaire) et >> (shift) pour améliorer les performances.
-<br>
-A faire : Plus appronfondir sur les binaires et les décalages de bits.
+<b><u>Points à approfondir :</u></b>
+- Approfondir les notions de manipulations binaires (opérateurs & et >>).
+- Étudier des méthodes pour réduire encore l'espace de recherche (heuristiques ou optimisations supplémentaires).
