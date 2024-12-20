@@ -1,77 +1,89 @@
+from collections import deque, defaultdict
+
 from srcp.utils.input import get_data
-from collections import deque
 
 
-data = get_data(2024, 20)
-
-lines = data.splitlines()
-
-
-def parse_map(racetrack: list[str]):
-    start, end = None, None
-    grid: list[list[str]] = []
-    for y, line in enumerate(racetrack):
-        grid.append(list(line))
-        if "S" in line:
-            start = (y, line.index("S"))
-        if "E" in line:
-            end = (y, line.index("E"))
-    return grid, start, end
+def parse_map(inpt: str):
+    g = [list(r) for r in inpt.strip().splitlines()]
+    s, e = None, None
+    for ri, row in enumerate(g):
+        for ci, cell in enumerate(row):
+            if cell == 'S':
+                s = (ri, ci)
+            elif cell == 'E':
+                e = (ri, ci)
+    return g, s, e
 
 
-def is_within_bounds(grid: list[list[str]], x: int, y: int):
-    return 0 <= x < len(grid) and 0 <= y < len(grid[0])
+# Génération d'une grille de distances en partant de la fin
+def bfs_from_end(g: list[list[str]], e: tuple[int, int]) -> list[list[float]]:
+    rows, cols = len(g), len(g[0])
+    distances = [[float('inf')] * cols for _ in range(rows)]
+    queue = deque([e])
+    distances[e[0]][e[1]] = 0
+    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+    while queue:
+        x, y = queue.popleft()
+        for dx, dy in directions:
+            nx, ny = x + dx, y + dy
+            if 0 <= nx < rows and 0 <= ny < cols and g[nx][ny] != '#' and distances[nx][ny] == float('inf'):
+                distances[nx][ny] = distances[x][y] + 1
+                queue.append((nx, ny))
+    return distances
 
 
-def bfs(grid: list[list[str]], start: tuple[int, int], end: tuple[int, int], cheat=False):
-    directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
-    queue = deque([(start, 0, False)])  # (position, steps, cheat_used)
+def find_path(g, s: tuple[int, int], e_d: list[list[float]], e: tuple[int, int]) -> list[tuple[int, int]]:
+    queue = deque([(s, [])])
     visited = set()
-    visited.add((start, False))
+    visited.add(s)
+
+    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 
     while queue:
-        (x, y), steps, cheat_used = queue.popleft()
-        if (x, y) == end:
-            return steps
+        (x, y), p = queue.popleft()
+        new_p = p + [(x, y)]
+
+        if (x, y) == e:
+            return new_p
 
         for dx, dy in directions:
             nx, ny = x + dx, y + dy
-            if is_within_bounds(grid, nx, ny):
-                # Déplacement normal
-                if grid[nx][ny] in (".", "E") and ((nx, ny), cheat_used) not in visited:
-                    visited.add(((nx, ny), cheat_used))
-                    queue.append(((nx, ny), steps + 1, cheat_used))
-                # Traversée de mur (uniquement si on a encore la possibilité de tricher)
-                elif grid[nx][ny] == "#" and not cheat_used and cheat:
-                    for ddx, ddy in directions:
-                        nnx, nny = nx + ddx, ny + ddy
-                        if is_within_bounds(grid, nnx, nny) and grid[nnx][nny] in (".", "E"):
-                            if ((nnx, nny), True) not in visited:
-                                visited.add(((nnx, nny), True))
-                                queue.append(((nnx, nny), steps + 2, True))
-    return float("inf")
+            if 0 <= nx < len(g) and 0 <= ny < len(g[0]) and g[nx][ny] != '#':
+                next_pos = (nx, ny)
+                if next_pos not in visited and e_d[nx][ny] < e_d[x][y]:
+                    visited.add(next_pos)
+                    queue.append((next_pos, new_p))
+    return []
 
 
-def calculate_cheats(racetrack: list[str]):
-    grid, start, end = parse_map(racetrack)
-    no_cheat_time = bfs(grid, start, end)
-    cheat_savings = []
+# Example map
+map_text = get_data(2024, 20)
 
-    for x in range(len(grid)):
-        for y in range(len(grid[0])):
-            if grid[x][y] == "#":
-                grid[x][y] = "."  # Temporarily remove the wall
-                cheat_time = bfs(grid, start, end, cheat=True)
-                if cheat_time < no_cheat_time:
-                    cheat_savings.append(no_cheat_time - cheat_time)
-                grid[x][y] = "#"
-    return cheat_savings
+grid, start, end = parse_map(map_text.strip())
+end_distances: list[list[float]] = bfs_from_end(grid, end)
+path: list[tuple[int, int]] = find_path(grid, start, end_distances, end)
 
+cheats = defaultdict(int)
+max_cheat_length = 20
+min_benefit = 100
 
-def count_cheats_saving_time(racetrack, min_saving):
-    cheat_savings = calculate_cheats(racetrack)
-    return sum(1 for saving in cheat_savings if saving >= min_saving)
+for i in range(len(path)):
+    for j in range(i + 1, len(path)):
+        a, b = path[i], path[j]
+        manhattan_distance = abs(a[0] - b[0]) + abs(a[1] - b[1])
 
+        if manhattan_distance > max_cheat_length:
+            continue
 
-result = count_cheats_saving_time(lines, 100)
-print("Nombre de triches économisant au moins 100 picosecondes :", result)
+        dir_path_length = manhattan_distance
+        distance_b_to_end = end_distances[b[0]][b[1]]
+
+        if distance_b_to_end + dir_path_length >= end_distances[a[0]][a[1]]:
+            continue
+
+        benefit = end_distances[a[0]][a[1]] - (distance_b_to_end + dir_path_length)
+
+        if benefit >= min_benefit:
+            cheats[benefit] += 1
+
+print(sum(cheats.values()))
