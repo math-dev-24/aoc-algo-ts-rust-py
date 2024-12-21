@@ -1,5 +1,7 @@
 from typing import Optional
 
+from srcp.utils.input import get_data
+
 numeric_pad = [
     ["7", "8", "9"],
     ["4", "5", "6"],
@@ -13,11 +15,14 @@ arrow_pad = [
 ]
 
 int_pad = [
-    [None, "A", None],
-    ["^", None, ">"],
-    [None, "v", None],
+    [None, None, "A"],
+    ["<", "v", ">"],
     ["<", None, None]
 ]
+
+
+def manhattan_distance(pos1, pos2):
+    return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1])
 
 
 def find_position(target: str, keyboard: list[list[str]]) -> Optional[dict]:
@@ -100,14 +105,26 @@ def transform_command(list_sequence: list[str], pad: list[list[str]], start_posi
     return sequences
 
 
-
 code = "029A"
 numeric_sequence = generate_sequence_for_code(code)
-print("Séquence pavé numérique :", "".join(numeric_sequence))
+print("".join(numeric_sequence))
+print("<A^A>^^AvvvA")
 
 intermediate_sequence = transform_command(numeric_sequence, arrow_pad)
-print("Séquence pavé intermédiaire :", "".join(intermediate_sequence))
+print("".join(intermediate_sequence))
+print("v<<A>>^A<A>AvA<^AA>A<vAAA>^A")
 
 human_sequence = transform_command(intermediate_sequence, int_pad)
-print("Séquence pavé humaine :", "".join(human_sequence))
+print("".join(human_sequence))
+print("<vA<AA>>^AvAA<^A>A<v<A>>^AvA^A<vA>^A<v<A>^A>AAvA^A<v<A>A>^AAAvA<^A>A")
 
+print(len(human_sequence))
+
+total = 0
+
+for code in get_data(2024, 21).splitlines():
+    sequence = generate_sequence_for_code(code)
+    intermediate_sequence = transform_command(sequence, arrow_pad)
+    human_sequence = transform_command(intermediate_sequence, arrow_pad)
+    total += len(human_sequence) * int(code[:-1])
+print(total)
