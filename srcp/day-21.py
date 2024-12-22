@@ -89,8 +89,8 @@ def get_arrow_dir_int(initial_position: tuple[int, int], target: str, pad: list[
     return result
 
 
-def transform_command(list_sequence: list[str], pad: list[list[str]], start_position="A") -> list[str]:
-    current_position = find_position(start_position, pad)
+def transform_command(list_sequence: list[str], pad: list[list[str]]) -> list[str]:
+    current_position = find_position("A", pad)
 
     x, y = current_position["position"]
     sequences = []
