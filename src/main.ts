@@ -1,7 +1,6 @@
 import getInput from './utils/input';
 import postAnswer from "./utils/post";
-import {solve_day_19} from "./day19";
-
+import {solve_day_19} from "./2024/day19";
 
 
 

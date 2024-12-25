@@ -1,4 +1,4 @@
-import combinations from "./utils/iterTools";
+import combinations from "../utils/iterTools";
 
 export function solve_day_8(data: string): string {
     const grid: string[][] = data.split("\n").map((r: string) => r.trim().split(""));
