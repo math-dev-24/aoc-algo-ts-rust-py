@@ -4,7 +4,7 @@
 - Chaque lettre est une zones
 - il faut calculer les coter et l'aire
 
-![image](./assets/day_12_research.png)
+![image](assets/day_12_research.png)
 
 ## Visualisation des zones avec turtle
-![image](./assets/turtle_day_12.png)
+![image](assets/turtle_day_12.png)

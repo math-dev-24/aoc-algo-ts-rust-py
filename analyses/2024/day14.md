@@ -5,4 +5,4 @@ Recherche de l'easter egg :
 - Focus sur le moment ou tous les robots ne soit pas supperposés
 <br/>
 
-![image](./assets/result_day_14.png)
+![image](assets/result_day_14.png)

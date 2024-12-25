@@ -4,4 +4,4 @@
 - Simuler 100 clignements
 - A chaque clignement :
 <br/>
-![image](./assets/day_11_stone.png)
+![image](assets/day_11_stone.png)

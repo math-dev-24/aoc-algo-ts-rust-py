@@ -7,5 +7,5 @@ utilisation de la méthode substitution.
 
 Code python : [srcp/day-13.py](https://github.com/math-dev-24/aoc-2024-ts-rust/blob/main/srcp/day-13.py)
 
-![image](./assets/equation2_y_x.png)
+![image](assets/equation2_y_x.png)
 

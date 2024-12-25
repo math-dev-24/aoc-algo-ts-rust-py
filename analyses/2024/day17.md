@@ -5,7 +5,7 @@
 ## Objectif
 Trouver A pour que les outputs correspondent au programme initial.
 
-![recherche](./assets/day_17.png)
+![recherche](assets/day_17.png)
 
 
 ## Principe de fonctionnement et analyse
@@ -25,7 +25,7 @@ Mais le nombre ``A`` est très important !
 J'ai essayé de décomposer un cycle pour voir comment mon output est impacté en fonction de A.
 
 
-![recherche](./assets/day_17_2.png)
+![recherche](assets/day_17_2.png)
 
 ## Etapes détaillées et approche adoptée
 
@@ -52,7 +52,7 @@ Ces étapes sont répétées pour chaque instruction du programme.
 
 ## Illustation
 
-![recherche](./assets/day_17_3.png)
+![recherche](assets/day_17_3.png)
 
 ## Recherche pratique
 Exemple script fonctionnel :
