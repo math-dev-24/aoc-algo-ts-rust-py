@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use regex::Regex;
 
-pub fn solve_day2_2023(input: &str) -> (usize, usize) {
+pub fn solve_day2_2023(input: &str) -> u32 {
     let games: Vec<&str> = input.lines().collect();
     let mut total_valid_ids: usize = 0;
     let mut total_power: usize = 0;
@@ -49,16 +49,14 @@ pub fn solve_day2_2023(input: &str) -> (usize, usize) {
             }
 
             if !valid_game {
-                break; // Si une observation dépasse les limites, le jeu est invalide
+                break;
             }
         }
 
-        // Partie 1 : Ajouter l'ID si le jeu est valide
         if valid_game {
             total_valid_ids += game_id;
         }
 
-        // Partie 2 : Calculer la puissance après avoir traité toutes les observations
         let power = required_cubes["red"] as usize
             * required_cubes["green"] as usize
             * required_cubes["blue"] as usize;
@@ -66,7 +64,7 @@ pub fn solve_day2_2023(input: &str) -> (usize, usize) {
         total_power += power;
     }
 
-    println!("Total des IDs valides : {}", total_valid_ids);
+    println!("Game valides : {}", total_valid_ids);
     println!("Somme des puissances : {}", total_power);
-    (total_valid_ids, total_power)
+    0
 }
