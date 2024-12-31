@@ -43,9 +43,8 @@ impl Grid {
         }
 
         if move_to.row != 0 || move_to.col != 0 {
-            let tmp_char = self.grid[current_pos.row][current_pos.col];
             self.grid[current_pos.row][current_pos.col] = '.';
-            self.grid[next_pos.row][next_pos.col] = tmp_char;
+            self.grid[next_pos.row][next_pos.col] = d_pos.char;
             self.grid[move_to.row][move_to.col] = 'O';
         }
     }
@@ -81,6 +80,7 @@ impl Point {
 struct Direction {
     d_col: isize,
     d_row: isize,
+    char: char,
 }
 
 pub fn solve_run_day_15(input: &str) -> u8 {
@@ -130,10 +130,10 @@ pub fn solve_run_day_15(input: &str) -> u8 {
 
 fn get_direction(command: &str) -> Option<Direction> {
     match command {
-        ">" => Some(Direction { d_col: 0, d_row: 1 }),
-        "v" => Some(Direction { d_col: 1, d_row: 0 }),
-        "<" => Some(Direction { d_col: 0, d_row: -1 }),
-        "^" => Some(Direction { d_col: -1, d_row: 0 }),
+        ">" => Some(Direction { d_col: 0, d_row: 1, char: '>' }),
+        "v" => Some(Direction { d_col: 1, d_row: 0, char: 'v' }),
+        "<" => Some(Direction { d_col: 0, d_row: -1, char: '<' }),
+        "^" => Some(Direction { d_col: -1, d_row: 0, char: '^' }),
         _ => None,
     }
 }
