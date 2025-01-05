@@ -8,45 +8,55 @@ struct Grid {
 
 impl Grid {
     fn can_move(&self, pos: &Point, d_pos: &Direction) -> bool {
-        let new_pos: Point = pos.get_next(&d_pos);
+        let mut current_pos = pos.clone();
 
-        if self.grid[new_pos.row][new_pos.col] == '#' {
-            return false;
+        while let Some(new_pos) = current_pos.get_next(&d_pos, &self.grid) {
+            match self.grid[new_pos.row][new_pos.col] {
+                '#' => return false,
+                '.' => return true,
+                _ => current_pos = new_pos,
+            }
         }
-        if self.grid[new_pos.row][new_pos.col] == '.' {
-            return true;
-        }
-        self.can_move(&Point { row: new_pos.row, col: new_pos.col }, &d_pos)
+        false
     }
 
     fn push_block(&mut self, pos: &Point, d_pos: &Direction) {
         let mut current_pos: Point = pos.clone();
-        let next_pos: Point = current_pos.get_next(&d_pos);
-        let mut move_to: Point = Point { row: 0, col: 0 };
+        let mut available_pos: Option<Point> = None;
 
-        loop {
-            let next_pos: Point = current_pos.get_next(&d_pos);
-
-            if next_pos.row >= self.rows || next_pos.col >= self.cols || self.grid[next_pos.row][next_pos.col] == '#' {
-                break;
-            }
-
+        while let Some(next_pos) = current_pos.get_next(&d_pos, &self.grid) {
             match self.grid[next_pos.row][next_pos.col] {
                 '.' => {
-                    move_to = next_pos;
+                    available_pos = Some(next_pos);
                     break;
                 }
+                'O' => {
+                    current_pos = next_pos;
+                }
                 _ => {
-                    return;
+                    break;
                 }
             }
         }
 
-        if move_to.row != 0 || move_to.col != 0 {
-            self.grid[current_pos.row][current_pos.col] = '.';
-            self.grid[next_pos.row][next_pos.col] = d_pos.char;
+        if let Some(move_to) = available_pos {
+            self.grid[pos.row][pos.col] = '.';
+            let next_position = pos.get_next(&d_pos, &self.grid).unwrap();
+            self.grid[next_position.row][next_position.col] = d_pos.char;
             self.grid[move_to.row][move_to.col] = 'O';
         }
+    }
+
+    fn get_points(&self) -> u32 {
+        let mut total: u32 = 0;
+        for row in 0..self.rows {
+            for col in 0..self.cols {
+                if self.grid[row][col] == 'O' {
+                    total += 100 * row as u32 + col as u32;
+                }
+            }
+        }
+        total
     }
 
     fn print_grid(&self) {
@@ -66,12 +76,13 @@ struct Point {
 }
 
 impl Point {
-    fn get_next(&self, d_pos: &Direction) -> Point {
+    fn get_next(&self, d_pos: &Direction, grid: &Vec<Vec<char>>) -> Option<Point> {
         let new_row: isize = self.row as isize + d_pos.d_row;
         let new_col: isize = self.col as isize + d_pos.d_col;
-        Point {
-            row: new_row as usize,
-            col: new_col as usize,
+        if new_row >= 0 && new_row < grid.len() as isize && new_col >= 0 && new_col < grid[0].len() as isize {
+            Some(Point { row: new_row as usize, col: new_col as usize })
+        } else {
+            None
         }
     }
 }
@@ -99,41 +110,44 @@ pub fn solve_run_day_15(input: &str) -> u8 {
 
     let mut positions: Point = Point { row: 0, col: 0 };
 
-    let commands = data_in[1].trim().split("").collect::<Vec<&str>>();
+    let commands = data_in[1].trim().chars()
+        .filter(|c| !c.is_whitespace())
+        .collect::<Vec<char>>();
 
-    for row in 0..grid.rows {
+    'outer: for row in 0..grid.rows {
         for col in  0..grid.cols {
             let tmp = grid.grid[row][col];
             if tmp == '@' {
                 positions = Point { row, col };
-                break;
+                break 'outer;
             }
         }
     }
-    println!("positions initial: {:?}", &positions);
+
+    println!("Start position: {:?}", positions);
 
     for command in commands {
-        if let Some(tmp_dirs) = get_direction(command) {
-
-            println!("Direction : {:?}", &tmp_dirs);
-
+        if let Some(tmp_dirs) = get_direction(&command) {
             if grid.can_move(&positions, &tmp_dirs) {
                 grid.push_block(&positions, &tmp_dirs);
+                positions = positions.get_next(&tmp_dirs, &grid.grid).unwrap();
             }
         }
     }
-
     grid.print_grid();
+
+    let points =grid.get_points();
+    println!("points: {}", points);
+    println!("{}", 1552463 == points);
     0
 }
 
-
-fn get_direction(command: &str) -> Option<Direction> {
+fn get_direction(command: &char) -> Option<Direction> {
     match command {
-        ">" => Some(Direction { d_col: 0, d_row: 1, char: '>' }),
-        "v" => Some(Direction { d_col: 1, d_row: 0, char: 'v' }),
-        "<" => Some(Direction { d_col: 0, d_row: -1, char: '<' }),
-        "^" => Some(Direction { d_col: -1, d_row: 0, char: '^' }),
+        '>' => Some(Direction { d_col: 1, d_row: 0, char: '>' }),
+        'v' => Some(Direction { d_col: 0, d_row: 1, char: 'v' }),
+        '<' => Some(Direction { d_col: -1, d_row: 0, char: '<' }),
+        '^' => Some(Direction { d_col: 0, d_row: -1, char: '^' }),
         _ => None,
     }
 }
