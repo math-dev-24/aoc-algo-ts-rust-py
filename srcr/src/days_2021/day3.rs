@@ -7,12 +7,12 @@ pub fn solve_day3(input: &str) -> u32 {
     let mut gamma: Vec<usize> = vec![0; length];
     let mut epsilon: Vec<usize> = vec![0; length];
 
-    for l in 0..length {
+    for index in 0..length {
         let mut one_count: usize = 0;
         let mut zero_count: usize = 0;
 
         for line in lines.iter() {
-            let tmp_val = line.chars().nth(l).unwrap();
+            let tmp_val = line.chars().nth(index).unwrap();
             if tmp_val == '1' {
                 one_count += 1;
             }
@@ -22,11 +22,11 @@ pub fn solve_day3(input: &str) -> u32 {
         }
 
         if one_count > zero_count {
-            gamma[l] = 1;
-            epsilon[l] = 0;
+            gamma[index] = 1;
+            epsilon[index] = 0;
         }else{
-            gamma[l] = 0;
-            epsilon[l] = 1;
+            gamma[index] = 0;
+            epsilon[index] = 1;
         }
     }
 

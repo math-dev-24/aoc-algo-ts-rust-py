@@ -14,14 +14,18 @@ impl Input {
         dotenv().ok();
         let session = env::var("SESSION").unwrap();
         let base_url = env::var("URL").unwrap();
+
         Self {
             client: Client::new(),
             cookie: format!("session={}", session),
             base_url,
         }
     }
+
     pub async fn get_input(&self, year: u32, day: u32) -> String {
         let url = format!("{}/{}/day/{}/input", &self.base_url, year, day);
+
+        println!("{}", url);
 
         let response: Response = self
             .client
