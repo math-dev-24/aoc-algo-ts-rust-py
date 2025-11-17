@@ -7,3 +7,5 @@ srcp/utils/__pycache__
 venv
 .idea
 .DS_Store
+/*/logs.txt
+/srcr/logs.txt
