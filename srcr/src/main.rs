@@ -1,10 +1,10 @@
 mod utils;
-mod days_2023;
+mod days_2025;
 
 use std::time::Instant;
 use utils::input::Input;
 
-use crate::days_2023::day3;
+use crate::days_2025::day1::solve_day_1;
 use crate::utils::log::{LogDetail, LogLevel, Logger};
 
 #[tokio::main]
@@ -12,8 +12,8 @@ async fn main() {
     let input = Input::new();
     // -------------------------------------------------------------------------------------
 
-    let year = 2023;
-    let day = 3;
+    let year = 2025;
+    let day = 1;
     let mut logger = Logger::new(LogLevel::Debug);
 
     // -------------------------------------------------------------------------------------
@@ -53,7 +53,7 @@ async fn main() {
     let start_time: Instant = Instant::now();
 
     // Script ACTION
-    day3::solve_day3_part2(&get_input);
+    solve_day_1(&get_input);
     // End Script ACTION
 
     logger.post(LogDetail {
