@@ -11,12 +11,12 @@
   "author": "B.Mathieu",
   "license": "ISC",
   "devDependencies": {
-    "@types/node": "^22.10.1",
+    "@types/node": "^22.19.1",
     "ts-node": "^10.9.2",
-    "typescript": "^5.7.2"
+    "typescript": "^5.9.3"
   },
   "dependencies": {
-    "dotenv": "^16.4.7",
+    "dotenv": "^16.6.1",
     "sync-request": "^6.1.0"
   }
 }
