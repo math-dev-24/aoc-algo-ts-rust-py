@@ -9,7 +9,6 @@ pub fn solve_day_3(input: &str) -> u64 {
             let mut selected = Vec::with_capacity(TARGET);
             let mut start = 0;
 
-            // Pour chaque position dans le résultat final
             for pos in 0..TARGET {
                 let window_end = n - (TARGET - pos - 1);
 
