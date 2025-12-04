@@ -9,3 +9,4 @@ venv
 .DS_Store
 /*/logs.txt
 /srcr/logs.txt
+*/.env

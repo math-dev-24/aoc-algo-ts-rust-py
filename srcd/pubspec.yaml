@@ -1,0 +1,11 @@
+name: aoc
+description: Advent of Code
+version: 1.0.0
+
+environment: 
+  sdk: ^3.0.0
+
+
+dependencies:
+  http: ^1.6.0
+  dotenv: ^4.2.0
