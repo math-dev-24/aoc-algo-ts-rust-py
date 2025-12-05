@@ -1,21 +1,19 @@
 import 'package:aoc/input.dart';
 
-import 'bin/day1.dart';
+import 'bin/day2.dart';
 
 void main() async {
   final inputFetcher = Input();
 
-  final String input = await inputFetcher.getInput(2025, 1);
+  final String input = await inputFetcher.getInput(2025, 2);
 
   inputFetcher.close();
 
-  final day_1 = Day1(input);
+  final day_1 = Day2(input);
   
-  final result = day_1.getResult();
-  final result2 = day_1.getResult2();
+  final (r1, r2) = day_1.getResult();
 
-  print("Résultat 1 :" + result.toString());
-  print("Résultat 1 :" + result2.toString());
+  print("Résultat 1 :" + r1.toString() +" R2 :" + r2.toString());
 
   return;
 }
