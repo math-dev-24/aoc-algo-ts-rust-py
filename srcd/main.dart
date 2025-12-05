@@ -1,6 +1,6 @@
 import 'package:aoc/input.dart';
 
-import 'bin/day2.dart';
+import 'bin/2025/day2.dart';
 
 void main() async {
   final inputFetcher = Input();
