@@ -1,12 +1,12 @@
-class Day2 {
+class Day2_2025 {
   final List<String> listOfRange;
 
-  Day2._({required this.listOfRange});
+  Day2_2025._({required this.listOfRange});
 
-  factory Day2(String input) {
+  factory Day2_2025(String input) {
     final List<String> listOfRange =
         input.split(",").map((String e) => e.trim()).toList();
-    return Day2._(listOfRange: listOfRange);
+    return Day2_2025._(listOfRange: listOfRange);
   }
 
   (int, int) getResult() {

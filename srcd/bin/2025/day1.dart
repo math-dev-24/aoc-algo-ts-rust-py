@@ -1,17 +1,17 @@
 
-class Day1 {
+class Day1_2025 {
 
   int pointer = 50;
   int count = 0;
   final List<String> lines;
 
-  Day1._({
+  Day1_2025._({
     required this.lines
   });
 
-  factory Day1(String input) {
+  factory Day1_2025(String input) {
     final List<String> lines = input.split("\n");
-    return Day1._(lines: lines);
+    return Day1_2025._(lines: lines);
   }
 
   (String, int) getDirAndAngle(String s) {
