@@ -1,3 +1,4 @@
+use colored::Colorize;
 
 pub fn solve_day_7(input: &str) {
 
@@ -5,7 +6,7 @@ pub fn solve_day_7(input: &str) {
     .map(|l| l.chars().collect::<Vec<char>>())
     .collect::<Vec<Vec<char>>>();
 
-    let part_1 = part_1(&grid, false);
+    let part_1 = part_1(&grid, true);
 
     let part_2 = count_all_timelines(&grid);
 
@@ -26,8 +27,29 @@ fn search_start(line: Vec<char>) -> usize {
     panic!("Start introuvable !")
 }
 
-fn print_grid(grid: Vec<Vec<char>>) {
-    println!("{}", grid.iter().map(|l| l.iter().collect::<String>()).collect::<Vec<String>>().join("\n"));
+fn draw_tree(grid: &Vec<Vec<char>>) {
+    let width = grid[0].len();
+
+    for (row, line) in grid.iter().enumerate() {
+        for (col, &ch) in line.iter().enumerate() {
+            let colored_char = match ch {
+                '.' => {
+                    let has_left = col > 0 && grid[row][col - 1] == '|';
+                    let has_right = col + 1 < width && grid[row][col + 1] == '|';
+
+                    if has_left && has_right {
+                        ch.to_string().green()
+                    } else {
+                        ch.to_string().dimmed()
+                    }
+                },
+                '^' | '|' | 'S' => ch.to_string().green().bold(),
+                _ => ch.to_string().normal(),
+            };
+            print!("{}", colored_char);
+        }
+        println!();
+    }
 }
 
 fn count_all_timelines(grid: &Vec<Vec<char>>) -> usize {
@@ -36,18 +58,14 @@ fn count_all_timelines(grid: &Vec<Vec<char>>) -> usize {
     let height = grid.len();
     let width = grid[0].len();
 
-    // HashMap: (row, col) -> nombre de chemins qui arrivent à cette position
     let mut paths: HashMap<(usize, usize), usize> = HashMap::new();
 
-    // Trouver le départ (S)
     let start_col = search_start(grid[0].clone());
     paths.insert((0, start_col), 1);
 
-    // Pour chaque ligne
     for row in 0..height - 1 {
         let mut next_paths: HashMap<(usize, usize), usize> = HashMap::new();
 
-        // Pour chaque position de la ligne actuelle qui a des chemins
         for ((r, col), count) in paths.iter() {
             if *r != row {
                 continue;
@@ -57,10 +75,8 @@ fn count_all_timelines(grid: &Vec<Vec<char>>) -> usize {
             let el = grid[next_row][*col];
 
             if el == '.' {
-                // Continue tout droit
                 *next_paths.entry((next_row, *col)).or_insert(0) += count;
             } else if el == '^' {
-                // Se divise en deux chemins (gauche et droite)
                 if *col > 0 {
                     *next_paths.entry((next_row, col - 1)).or_insert(0) += count;
                 }
@@ -70,13 +86,11 @@ fn count_all_timelines(grid: &Vec<Vec<char>>) -> usize {
             }
         }
 
-        // Ajouter les nouveaux chemins
         for (pos, count) in next_paths {
             *paths.entry(pos).or_insert(0) += count;
         }
     }
 
-    // Compter tous les chemins uniques qui atteignent la dernière ligne
     paths.iter()
         .filter(|((r, _), _)| *r == height - 1)
         .map(|(_, count)| count)
@@ -111,6 +125,7 @@ fn part_1(grid: &Vec<Vec<char>>, print_result: bool) -> usize {
                 tmp_list.push(col);
             } else if el == '^' {
                 counter += 1;
+                grid[row][col] = '|';  // Marquer la position du ^
                 let new_col = [col-1, col+1];
                 for new in new_col {
                     if new < length_row {
@@ -125,8 +140,8 @@ fn part_1(grid: &Vec<Vec<char>>, print_result: bool) -> usize {
     }
 
     if print_result {
-        print_grid(grid);
+        draw_tree(&grid);
     }
-    
+
     counter
 }
