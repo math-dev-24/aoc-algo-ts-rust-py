@@ -4,7 +4,7 @@ mod days_2025;
 use std::time::Instant;
 use utils::input::Input;
 
-use crate::days_2025::day7::solve_day_7;
+use crate::days_2025::day8::solve_day_8;
 
 use crate::utils::log::{LogDetail, LogLevel, Logger};
 
@@ -14,7 +14,7 @@ async fn main() {
     // -------------------------------------------------------------------------------------
 
     let year = 2025;
-    let day = 7;
+    let day = 8;
 
     let mut logger = Logger::new(LogLevel::Debug);
 
@@ -55,7 +55,7 @@ async fn main() {
     let start_time: Instant = Instant::now();
 
     // Script ACTION
-    solve_day_7(&get_input);
+    solve_day_8(&get_input);
 
     // End Script ACTION
 
