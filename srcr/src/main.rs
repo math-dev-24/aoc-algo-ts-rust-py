@@ -1,10 +1,10 @@
-mod utils;
 mod days_2025;
+mod utils;
 
 use std::time::Instant;
 use utils::input::Input;
 
-use crate::days_2025::day9::solve_day_9;
+use crate::days_2025::day10::solve_day_10;
 
 use crate::utils::log::{LogDetail, LogLevel, Logger};
 
@@ -14,24 +14,27 @@ async fn main() {
     // -------------------------------------------------------------------------------------
 
     let year = 2025;
-    let day = 9;
+    let day = 10;
 
     let mut logger = Logger::new(LogLevel::Debug);
 
     // -------------------------------------------------------------------------------------
-    let info_start = format!("Récupération des données... - year:{} - day:{}", &year, &day);
+    let info_start = format!(
+        "Récupération des données... - year:{} - day:{}",
+        &year, &day
+    );
 
     logger.post(LogDetail {
         msg: info_start,
-        timestamp: Instant::now()
+        timestamp: Instant::now(),
     });
 
     let get_input = match input.get_input(year, day).await {
         Ok(input) => input,
         Err(e) => {
             logger.post(LogDetail {
-                msg: format!("Erreur : {}",e)
-                ,timestamp: Instant::now()
+                msg: format!("Erreur : {}", e),
+                timestamp: Instant::now(),
             });
             return;
         }
@@ -39,31 +42,30 @@ async fn main() {
 
     logger.post(LogDetail {
         msg: "Récupération des données...OK".to_string(),
-        timestamp: Instant::now()
+        timestamp: Instant::now(),
     });
 
     logger.post(LogDetail {
         msg: format!("Input : {}", &get_input),
-        timestamp: Instant::now()
+        timestamp: Instant::now(),
     });
 
     logger.post(LogDetail {
         msg: "Script en cours...".to_string(),
-        timestamp: Instant::now()
+        timestamp: Instant::now(),
     });
 
     let start_time: Instant = Instant::now();
 
     // Script ACTION
-    solve_day_9(&get_input);
+    solve_day_10(&get_input);
 
     // End Script ACTION
 
     logger.post(LogDetail {
         msg: format!("Temps du script {}s", start_time.elapsed().as_secs_f64()),
-        timestamp: Instant::now()
+        timestamp: Instant::now(),
     });
-
 
     logger.save().unwrap();
 }
