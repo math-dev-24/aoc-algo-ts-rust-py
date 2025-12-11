@@ -86,98 +86,236 @@ impl Machine {
     }
 
     fn min_presses_joltages(&self) -> usize {
-        // BFS avec pruning intelligent basé sur la taille du problème
-        use std::collections::{HashMap, VecDeque};
+        // Solve using Gaussian elimination + DFS for free variables
+        // This treats the problem as a system of linear equations:
+        // Each button press increments certain counters by 1
+        // We need to find minimum total presses to reach target values
 
-        let n_counters = self.target_joltages.len();
-        let total_target: usize = self.target_joltages.iter().sum();
+        let num_buttons = self.buttons.len();
+        let num_counters = self.target_joltages.len();
 
-        // Pour les petits problèmes, BFS complet
-        if total_target <= 60 {
-            let mut queue = VecDeque::new();
-            let mut visited = HashMap::new();
-
-            queue.push_back((vec![0; n_counters], 0));
-            visited.insert(vec![0; n_counters], 0);
-
-            while let Some((state, presses)) = queue.pop_front() {
-                if state == self.target_joltages {
-                    return presses;
-                }
-
-                for button in &self.buttons {
-                    let mut new_state = state.clone();
-                    let mut valid = true;
-
-                    for &idx in button {
-                        if idx < n_counters {
-                            new_state[idx] += 1;
-                            if new_state[idx] > self.target_joltages[idx] {
-                                valid = false;
-                                break;
-                            }
-                        }
-                    }
-
-                    if valid {
-                        if !visited.contains_key(&new_state) {
-                            visited.insert(new_state.clone(), presses + 1);
-                            queue.push_back((new_state, presses + 1));
-                        }
-                    }
-                }
-            }
-
-            return *visited.get(&self.target_joltages).unwrap_or(&usize::MAX);
+        if num_buttons == 0 || num_counters == 0 {
+            return 0;
         }
 
-        // Pour les gros problèmes, BFS avec limite de mémoire
-        let mut queue = VecDeque::new();
-        let mut visited = HashMap::new();
+        // Build augmented matrix [A | B] where:
+        // A[i][j] = 1 if button j affects counter i, 0 otherwise
+        // B[i] = target value for counter i
+        let mut matrix = vec![vec![0.0; num_buttons + 1]; num_counters];
 
-        queue.push_back((vec![0; n_counters], 0));
-        visited.insert(vec![0; n_counters], 0);
+        for (button_idx, button_wiring) in self.buttons.iter().enumerate() {
+            for &counter_idx in button_wiring {
+                if counter_idx < num_counters {
+                    matrix[counter_idx][button_idx] = 1.0;
+                }
+            }
+        }
 
-        while let Some((state, presses)) = queue.pop_front() {
-            if state == self.target_joltages {
-                return presses;
+        for i in 0..num_counters {
+            matrix[i][num_buttons] = self.target_joltages[i] as f64;
+        }
+
+        // Gaussian elimination to Row Echelon Form
+        let mut pivot_row = 0;
+        let mut col_to_pivot_row = vec![None; num_buttons];
+        let mut free_cols = Vec::new();
+
+        for col in 0..num_buttons {
+            if pivot_row >= num_counters {
+                free_cols.push(col);
+                continue;
             }
 
-            // Pruning: si trop d'états, nettoyer les anciens
-            if visited.len() > 200_000 {
-                visited.retain(|_, &mut v| v >= presses.saturating_sub(5));
+            // Find best pivot (partial pivoting)
+            let mut max_row = pivot_row;
+            for row in pivot_row + 1..num_counters {
+                if matrix[row][col].abs() > matrix[max_row][col].abs() {
+                    max_row = row;
+                }
             }
 
-            for button in &self.buttons {
-                let mut new_state = state.clone();
+            // Skip if pivot is too small
+            if matrix[max_row][col].abs() < 1e-9 {
+                free_cols.push(col);
+                continue;
+            }
+
+            matrix.swap(pivot_row, max_row);
+
+            // Normalize pivot row
+            let pivot_val = matrix[pivot_row][col];
+            for c in col..=num_buttons {
+                matrix[pivot_row][c] /= pivot_val;
+            }
+
+            // Eliminate other rows
+            for row in 0..num_counters {
+                if row != pivot_row {
+                    let factor = matrix[row][col];
+                    for c in col..=num_buttons {
+                        matrix[row][c] -= factor * matrix[pivot_row][c];
+                    }
+                }
+            }
+
+            col_to_pivot_row[col] = Some(pivot_row);
+            pivot_row += 1;
+        }
+
+        // Check for inconsistency
+        for row in pivot_row..num_counters {
+            if matrix[row][num_buttons].abs() > 1e-9 {
+                return usize::MAX; // Impossible
+            }
+        }
+
+        // If no free variables, compute directly
+        if free_cols.is_empty() {
+            let mut total = 0;
+            for col in 0..num_buttons {
+                if let Some(row) = col_to_pivot_row[col] {
+                    let val = matrix[row][num_buttons];
+                    if val < -1e-9 {
+                        return usize::MAX;
+                    }
+                    let rounded = val.round();
+                    if (val - rounded).abs() > 1e-9 {
+                        return usize::MAX;
+                    }
+                    total += rounded as usize;
+                }
+            }
+            return total;
+        }
+
+        // Compute weights for free variables
+        let mut free_var_weights = Vec::new();
+        for &col in &free_cols {
+            let mut weight = 1.0;
+            for row in 0..num_counters {
+                weight -= matrix[row][col];
+            }
+            free_var_weights.push(weight);
+        }
+
+        // Base cost (assuming all free vars = 0)
+        // This is the sum of all pivot variables when free vars = 0
+        let mut base_cost = 0.0;
+        for row in 0..num_counters {
+            // Only count valid equation rows (not 0=0)
+            if matrix[row][num_buttons].abs() > 1e-9
+                || (0..num_buttons).any(|c| matrix[row][c].abs() > 1e-9)
+            {
+                base_cost += matrix[row][num_buttons];
+            }
+        }
+
+        // DFS with pruning to find minimum
+        let initial_rhs: Vec<f64> = (0..num_counters).map(|r| matrix[r][num_buttons]).collect();
+        let mut min_presses = usize::MAX;
+        let mut stack = vec![(0, vec![0i64; num_buttons], base_cost, initial_rhs)];
+
+        while let Some((idx, solution, current_cost, current_rhs)) = stack.pop() {
+            // Pruning: cost lower bound
+            let mut min_future = 0.0;
+            for i in idx..free_cols.len() {
+                if free_var_weights[i] < 0.0 {
+                    min_future += free_var_weights[i] * 300.0;
+                }
+            }
+            if min_presses != usize::MAX && current_cost + min_future >= (min_presses as f64) - 1e-9 {
+                continue;
+            }
+
+            // Pruning: feasibility check
+            let mut feasible = true;
+            for row in 0..num_counters {
+                let mut min_future_sub = 0.0;
+                for i in idx..free_cols.len() {
+                    let col = free_cols[i];
+                    let coeff = matrix[row][col];
+                    if coeff < 0.0 {
+                        min_future_sub += coeff * 300.0;
+                    }
+                }
+                if current_rhs[row] < min_future_sub - 1e-9 {
+                    feasible = false;
+                    break;
+                }
+            }
+            if !feasible {
+                continue;
+            }
+
+            // All free variables assigned
+            if idx == free_cols.len() {
                 let mut valid = true;
+                let mut total = 0i64;
 
-                for &idx in button {
-                    if idx < n_counters {
-                        new_state[idx] += 1;
-                        if new_state[idx] > self.target_joltages[idx] {
+                // Sum free vars
+                for &col in &free_cols {
+                    total += solution[col];
+                }
+
+                // Check and sum pivot vars
+                for col in 0..num_buttons {
+                    if let Some(row) = col_to_pivot_row[col] {
+                        let val = current_rhs[row];
+                        if val < -1e-9 {
                             valid = false;
                             break;
                         }
+                        let rounded = val.round();
+                        if (val - rounded).abs() > 1e-9 {
+                            valid = false;
+                            break;
+                        }
+                        total += rounded as i64;
                     }
                 }
 
-                if valid {
-                    let new_presses = presses + 1;
-                    if !visited.contains_key(&new_state) || visited[&new_state] > new_presses {
-                        visited.insert(new_state.clone(), new_presses);
-                        queue.push_back((new_state, new_presses));
-                    }
+                if valid && total >= 0 && (total as usize) < min_presses {
+                    min_presses = total as usize;
                 }
+                continue;
             }
 
-            // Limite de sécurité
-            if presses > total_target * 2 {
-                break;
+            // Try values for next free variable
+            let col = free_cols[idx];
+            let weight = free_var_weights[idx];
+
+            // Heuristic: If weight is positive, try small values first.
+            // If weight is negative, try large values first.
+            if weight >= 0.0 {
+                for val in 0..=300 {
+                    let mut new_sol = solution.clone();
+                    new_sol[col] = val;
+
+                    let mut new_rhs = current_rhs.clone();
+                    for row in 0..num_counters {
+                        new_rhs[row] -= matrix[row][col] * (val as f64);
+                    }
+
+                    let new_cost = current_cost + weight * (val as f64);
+                    stack.push((idx + 1, new_sol, new_cost, new_rhs));
+                }
+            } else {
+                for val in (0..=300).rev() {
+                    let mut new_sol = solution.clone();
+                    new_sol[col] = val;
+
+                    let mut new_rhs = current_rhs.clone();
+                    for row in 0..num_counters {
+                        new_rhs[row] -= matrix[row][col] * (val as f64);
+                    }
+
+                    let new_cost = current_cost + weight * (val as f64);
+                    stack.push((idx + 1, new_sol, new_cost, new_rhs));
+                }
             }
         }
 
-        *visited.get(&self.target_joltages).unwrap_or(&usize::MAX)
+        if min_presses == usize::MAX { 0 } else { min_presses }
     }
 }
 
